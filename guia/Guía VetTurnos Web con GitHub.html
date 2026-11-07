@@ -1,0 +1,1577 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Guía VetTurnos Web</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Nunito+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: menú lateral con los 6 pasos; a la derecha explicación, código con las líneas nuevas resaltadas, vista previa funcionando y punto de control. */
+:root {
+  --bg: #f4f7f1;
+  --surface: #ffffff;
+  --fg: #1b2418;
+  --muted: #536050;
+  --line: #d6dfcf;
+  --accent: #1e5f00;
+  --on-accent: #ffffff;
+  --accent-soft: #e6f3de;
+  --brand: #39a900;
+  --bad: #b3261e;
+  --bad-soft: #fbe9e7;
+  --warn: #9a4400;
+  --code-bg: #14210f;
+  --code-fg: #e3eedb;
+  --code-dim: #8fa586;
+  --font-display: 'Bricolage Grotesque', 'Segoe UI', sans-serif;
+  --font-body: 'Nunito Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e150c; --surface: #162112; --fg: #e5eee0; --muted: #9db093;
+    --line: #2a3a25; --accent: #6fd62a; --on-accent: #0e150c; --accent-soft: #1d2d17;
+    --brand: #6fd62a; --bad: #ff9a90; --bad-soft: #3a1c19; --warn: #ffa968;
+    --code-bg: #0a1008; --code-fg: #dfead8; --code-dim: #7f9576;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e150c; --surface: #162112; --fg: #e5eee0; --muted: #9db093;
+  --line: #2a3a25; --accent: #6fd62a; --on-accent: #0e150c; --accent-soft: #1d2d17;
+  --brand: #6fd62a; --bad: #ff9a90; --bad-soft: #3a1c19; --warn: #ffa968;
+  --code-bg: #0a1008; --code-fg: #dfead8; --code-dim: #7f9576;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 26px 56px;
+}
+.wrap { max-width: 1160px; margin: 0 auto; display: grid; gap: 20px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(26px, 5vw, 38px); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 26px; font-weight: 700; }
+h3 { font: 700 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+p { margin: 0; }
+code { font-family: var(--font-mono); font-size: .88em; background: var(--accent-soft); padding: 1px 6px; border-radius: 4px; }
+pre code { background: none; padding: 0; border-radius: 0; font-size: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.kicker { font: 600 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+
+.top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(200px, 280px); gap: 20px; align-items: end; }
+@media (max-width: 720px) { .top { grid-template-columns: minmax(0, 1fr); } }
+.top p { color: var(--muted); max-width: 66ch; margin-top: 8px; }
+.progress { display: grid; gap: 6px; }
+.progress b { font: 700 13px var(--font-mono); }
+.bar { height: 10px; border-radius: 999px; background: var(--accent-soft); border: 1.5px solid var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--brand); width: 0; transition: width .4s; }
+
+.layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+nav#nav { display: grid; gap: 6px; position: sticky; top: env(safe-area-inset-top, 0px); }
+@media (max-width: 900px) { nav#nav { position: static; display: flex; overflow-x: auto; padding-bottom: 6px; } }
+.navitem {
+  display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: center; text-align: left;
+  font: 600 13.5px var(--font-body); color: var(--fg); background: var(--surface);
+  border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; cursor: pointer;
+}
+@media (max-width: 900px) { .navitem { flex: 0 0 auto; } .navitem .nt small { display: none; } }
+.navitem:hover { border-color: var(--accent); }
+.navitem[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.navitem .n { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 700 12px var(--font-mono); background: var(--line); color: var(--fg); }
+.navitem.done .n { background: var(--accent); color: var(--on-accent); }
+.navitem .nt { min-width: 0; line-height: 1.25; display: grid; }
+.navitem .nt small { font: 600 10.5px var(--font-mono); letter-spacing: .04em; color: var(--muted); text-transform: uppercase; }
+
+.step { display: grid; gap: 18px; min-width: 0; }
+.exhead { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.exhead .num { font: 600 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.tag { font: 700 11px var(--font-mono); letter-spacing: .05em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; border: 1.5px solid var(--accent); color: var(--accent); }
+.state { margin-left: auto; font: 700 12px var(--font-mono); color: var(--muted); }
+.state.ok { color: var(--accent); }
+.card { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 16px 18px; display: grid; gap: 10px; min-width: 0; align-content: start; }
+.concept { border-color: var(--accent); background: var(--accent-soft); }
+.concept b { color: var(--accent); }
+ol.todo { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+ol.todo li::marker { font-weight: 700; color: var(--accent); }
+.note { color: var(--muted); font-size: 14px; }
+ul.req { margin: 0; padding-left: 22px; display: grid; gap: 8px; }
+ul.req li::marker { color: var(--accent); }
+.gitcard { border-color: var(--brand); border-left-width: 6px; }
+
+.codehead { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 10px; }
+.legend { font-size: 13px; color: var(--muted); display: inline-flex; align-items: center; gap: 8px; }
+.legend i { width: 14px; height: 14px; border-radius: 3px; background: rgba(143, 224, 74, .35); border-left: 3px solid #8fe04a; display: inline-block; }
+.codewrap { background: var(--code-bg); border-radius: 10px; overflow: hidden; min-width: 0; }
+.codewrap .cap { font: 600 11px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--code-dim); padding: 9px 14px 0; }
+pre { margin: 0; padding: 8px 14px 14px; overflow-x: auto; color: var(--code-fg); font: 400 12.5px/1.65 var(--font-mono); }
+pre .l { display: block; padding: 0 14px; margin: 0 -14px; white-space: pre; }
+pre .l.n { background: rgba(143, 224, 74, .16); box-shadow: inset 3px 0 0 #8fe04a; }
+details.fold { border: 1.5px dashed var(--line); border-radius: 10px; background: var(--surface); }
+details.fold > summary { cursor: pointer; padding: 9px 14px; font: 600 13px var(--font-mono); color: var(--muted); }
+details.fold > .codewrap, details.fold > .inner { margin: 0 10px 10px; }
+.inner { display: grid; gap: 12px; }
+
+button.act {
+  font: 700 13.5px var(--font-body); border-radius: 8px; border: 1.5px solid var(--line);
+  background: var(--surface); color: var(--fg); padding: 9px 14px; cursor: pointer; min-width: 0;
+}
+button.act:hover { border-color: var(--accent); background: var(--accent-soft); }
+button.act.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+button.act.primary:hover { filter: brightness(1.12); background: var(--accent); }
+button.act.mono { font-family: var(--font-mono); font-size: 12.5px; text-align: left; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+.preview { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 16px; align-items: start; }
+@media (max-width: 980px) { .preview { grid-template-columns: minmax(0, 1fr); } }
+.pv { border: 1.5px solid var(--line); border-radius: 10px; overflow: hidden; background: #f4f7f1; min-width: 0; }
+.pv .bar2 { display: flex; gap: 6px; align-items: center; padding: 7px 12px; background: var(--surface); border-bottom: 1.5px solid var(--line); font: 600 11.5px var(--font-mono); color: var(--muted); }
+.pv .bar2 i { width: 9px; height: 9px; border-radius: 50%; background: var(--line); display: inline-block; }
+.pv .host { min-height: 280px; }
+.log { background: var(--bg); border: 1.5px dashed var(--line); border-radius: 10px; padding: 10px 12px; min-height: 90px; max-height: 240px; overflow: auto; font: 400 12.5px/1.55 var(--font-mono); display: grid; gap: 4px; align-content: start; }
+.log .empty { color: var(--muted); font-family: var(--font-body); font-size: 13.5px; }
+.log .ln { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 6px; overflow-wrap: anywhere; }
+.log .ln.ok .mk { color: var(--accent); }
+.log .ln.err, .log .ln.err .mk { color: var(--bad); }
+.log .src { color: var(--muted); }
+
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.checks label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; font-size: 14.5px; }
+.checks input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent); flex: 0 0 auto; }
+details.think { border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); padding: 12px 16px; }
+details.think summary { cursor: pointer; font-weight: 700; }
+details.think p { margin-top: 8px; color: var(--muted); }
+.navbtns { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="kicker">SENA · ADSO · Proyecto VetTurnos</div>
+      <h1>Construye la recepción de una veterinaria</h1>
+      <p>Vas a crear, paso a paso, una página web en un solo archivo <code>index.html</code> donde se registran perros, gatos y aves. Cada paso agrega un pilar de la POO y deja la página funcionando. Además, aprenderás a crear tu repositorio en GitHub, a subir un commit por cada fase y a cerrar el proyecto con un README. Escribe el código tú mismo; usa el botón de copiar solo si te atascas.</p>
+    </div>
+    <div class="progress" aria-live="polite">
+      <b id="prog-txt">0 de 6 pasos</b>
+      <div class="bar"><i id="prog-bar"></i></div>
+    </div>
+  </div>
+  <div class="layout">
+    <nav id="nav" aria-label="Pasos"></nav>
+    <main id="main"></main>
+  </div>
+</div>
+
+<script type="text/plain" data-k="css">
+:root {
+  --verde: #1e5f00;
+  --claro: #e6f3de;
+  --linea: #d6dfcf;
+  --rojo: #b3261e;
+}
+
+body {
+  font-family: system-ui, sans-serif;
+  background: #f4f7f1;
+  color: #1b2418;
+  margin: 0;
+  padding: 20px;
+}
+
+main { max-width: 560px; margin: 0 auto; }
+h1 { color: var(--verde); font-size: 24px; margin: 0 0 14px; }
+
+form {
+  background: #fff;
+  border: 1px solid var(--linea);
+  border-radius: 10px;
+  padding: 14px;
+  display: grid;
+  gap: 10px;
+}
+label { display: grid; gap: 4px; font-size: 13px; font-weight: 600; }
+input, select { padding: 8px; border: 1px solid var(--linea); border-radius: 6px; font-size: 14px; }
+button { background: var(--verde); color: #fff; border: 0; padding: 10px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+
+#mensaje { min-height: 20px; font-size: 13px; font-weight: 600; }
+#mensaje.error { color: var(--rojo); }
+#mensaje.ok { color: var(--verde); }
+
+#lista { list-style: none; padding: 0; display: grid; gap: 8px; margin: 14px 0 0; }
+.paciente { background: #fff; border-left: 4px solid var(--verde); border-radius: 6px; padding: 10px 12px; font-size: 14px; }
+.paciente small { color: #536050; display: block; margin-top: 2px; }
+#total { font-weight: 700; margin-top: 12px; }
+</script>
+<script type="text/plain" data-k="h0">
+<main>
+  <h1>Recepción VetTurnos</h1>
+
+  <form id="formulario">
+    <label>Tipo de mascota
+      <select id="tipo">
+        <option>Perro</option>
+        <option>Gato</option>
+      </select>
+    </label>
+    <label>Nombre
+      <input id="nombre" required>
+    </label>
+    <label>Peso (kg)
+      <input id="peso" type="number" step="0.1" required>
+    </label>
+    <button type="submit">Registrar</button>
+    <div id="mensaje"></div>
+  </form>
+
+  <ul id="lista"></ul>
+</main>
+</script>
+<script type="text/plain" data-k="j0">
+// Aquí vivirá toda la lógica. Por ahora solo comprobamos que el formulario responde.
+document.getElementById("formulario").addEventListener("submit", (e) => {
+  e.preventDefault();   // evita que la página se recargue al enviar
+  document.getElementById("mensaje").textContent = "El formulario funciona. Falta la lógica.";
+});
+</script>
+<script type="text/plain" data-k="h1">
+<main>
+  <h1>Recepción VetTurnos</h1>
+
+  <form id="formulario">
+    <label>Tipo de mascota
+      <select id="tipo">
+        <option>Perro</option>
+        <option>Gato</option>
+      </select>
+    </label>
+    <label>Nombre
+      <input id="nombre" required>
+    </label>
+    <label>Peso (kg)
+      <input id="peso" type="number" step="0.1" required>
+    </label>
+    <button type="submit">Registrar</button>
+    <div id="mensaje"></div>
+  </form>
+
+  <ul id="lista"></ul>
+</main>
+</script>
+<script type="text/plain" data-k="j1">
+// ===== Abstracción: la clase general no se puede crear, solo define el contrato =====
+class Mascota {
+  constructor(nombre, peso) {
+    if (new.target === Mascota) {
+      throw new TypeError("Mascota es abstracta: crea un Perro o un Gato");
+    }
+    this.nombre = nombre;
+    this.peso = peso;
+  }
+
+  // Contrato: toda mascota hace un sonido, pero cada una decide cuál
+  hacerSonido() {
+    throw new Error(`${this.constructor.name} debe implementar hacerSonido()`);
+  }
+}
+
+class Perro extends Mascota {
+  hacerSonido() {
+    return "¡Guau!";
+  }
+}
+
+class Gato extends Mascota {
+  hacerSonido() {
+    return "Miau";
+  }
+}
+
+// ===== Conexión con la página =====
+const pacientes = [];
+const lista = document.getElementById("lista");
+const mensaje = document.getElementById("mensaje");
+
+function mostrar(tipo, texto) {
+  mensaje.className = tipo;
+  mensaje.textContent = texto;
+}
+
+function dibujar() {
+  lista.innerHTML = "";
+  for (const m of pacientes) {
+    const li = document.createElement("li");
+    li.className = "paciente";
+    li.textContent = `${m.nombre} (${m.constructor.name}, ${m.peso} kg)`;
+    const detalle = document.createElement("small");
+    detalle.textContent = m.hacerSonido();
+    li.appendChild(detalle);
+    lista.appendChild(li);
+  }
+}
+
+document.getElementById("formulario").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const tipo = document.getElementById("tipo").value;
+  const nombre = document.getElementById("nombre").value;
+  const peso = Number(document.getElementById("peso").value);
+
+  const mascota = tipo === "Perro" ? new Perro(nombre, peso) : new Gato(nombre, peso);
+  pacientes.push(mascota);
+  dibujar();
+  mostrar("ok", `${nombre} registrado`);
+});
+</script>
+<script type="text/plain" data-k="h2">
+<main>
+  <h1>Recepción VetTurnos</h1>
+
+  <form id="formulario">
+    <label>Tipo de mascota
+      <select id="tipo">
+        <option>Perro</option>
+        <option>Gato</option>
+      </select>
+    </label>
+    <label>Nombre
+      <input id="nombre" required>
+    </label>
+    <label>Peso (kg)
+      <input id="peso" type="number" step="0.1" required>
+    </label>
+    <button type="submit">Registrar</button>
+    <div id="mensaje"></div>
+  </form>
+
+  <ul id="lista"></ul>
+  <p id="total"></p>
+</main>
+</script>
+<script type="text/plain" data-k="j2">
+// ===== Abstracción + Encapsulamiento =====
+class Mascota {
+  #peso;   // campo privado: solo existe dentro de la clase
+
+  constructor(nombre, peso) {
+    if (new.target === Mascota) {
+      throw new TypeError("Mascota es abstracta: crea un Perro o un Gato");
+    }
+    this.nombre = nombre;
+    this.peso = peso;   // pasa por el setter, así también se valida aquí
+  }
+
+  get peso() {
+    return this.#peso;
+  }
+
+  set peso(valor) {
+    if (typeof valor !== "number" || Number.isNaN(valor) || valor <= 0) {
+      throw new RangeError("El peso debe ser un número mayor que 0");
+    }
+    this.#peso = valor;
+  }
+
+  // Contrato: toda mascota hace un sonido, pero cada una decide cuál
+  hacerSonido() {
+    throw new Error(`${this.constructor.name} debe implementar hacerSonido()`);
+  }
+}
+
+class Perro extends Mascota {
+  hacerSonido() {
+    return "¡Guau!";
+  }
+}
+
+class Gato extends Mascota {
+  hacerSonido() {
+    return "Miau";
+  }
+}
+
+// La clínica protege su lista de pacientes
+class Clinica {
+  #pacientes = [];
+
+  registrar(mascota) {
+    if (!(mascota instanceof Mascota)) {
+      throw new TypeError("Solo se pueden registrar mascotas");
+    }
+    this.#pacientes.push(mascota);
+  }
+
+  get pacientes() {
+    return [...this.#pacientes];   // una copia: nadie altera la lista original
+  }
+}
+
+// ===== Conexión con la página =====
+const clinica = new Clinica();
+const lista = document.getElementById("lista");
+const mensaje = document.getElementById("mensaje");
+const total = document.getElementById("total");
+
+function mostrar(tipo, texto) {
+  mensaje.className = tipo;
+  mensaje.textContent = texto;
+}
+
+function dibujar() {
+  lista.innerHTML = "";
+  for (const m of clinica.pacientes) {
+    const li = document.createElement("li");
+    li.className = "paciente";
+    li.textContent = `${m.nombre} (${m.constructor.name}, ${m.peso} kg)`;
+    const detalle = document.createElement("small");
+    detalle.textContent = m.hacerSonido();
+    li.appendChild(detalle);
+    lista.appendChild(li);
+  }
+  total.textContent = `Pacientes hoy: ${clinica.pacientes.length}`;
+}
+
+document.getElementById("formulario").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const tipo = document.getElementById("tipo").value;
+  const nombre = document.getElementById("nombre").value;
+  const peso = Number(document.getElementById("peso").value);
+
+  try {
+    const mascota = tipo === "Perro" ? new Perro(nombre, peso) : new Gato(nombre, peso);
+    clinica.registrar(mascota);
+    dibujar();
+    mostrar("ok", `${nombre} registrado`);
+  } catch (error) {
+    mostrar("error", error.message);
+  }
+});
+
+dibujar();
+</script>
+<script type="text/plain" data-k="h3">
+<main>
+  <h1>Recepción VetTurnos</h1>
+
+  <form id="formulario">
+    <label>Tipo de mascota
+      <select id="tipo">
+        <option>Perro</option>
+        <option>Gato</option>
+        <option>Ave</option>
+      </select>
+    </label>
+    <label>Nombre
+      <input id="nombre" required>
+    </label>
+    <label>Peso (kg)
+      <input id="peso" type="number" step="0.1" required>
+    </label>
+    <label><span id="etiqueta">Raza</span>
+      <select id="extra"></select>
+    </label>
+    <button type="submit">Registrar</button>
+    <div id="mensaje"></div>
+  </form>
+
+  <ul id="lista"></ul>
+  <p id="total"></p>
+</main>
+</script>
+<script type="text/plain" data-k="j3">
+// ===== Abstracción + Encapsulamiento =====
+class Mascota {
+  #peso;   // campo privado: solo existe dentro de la clase
+
+  constructor(nombre, especie, peso) {
+    if (new.target === Mascota) {
+      throw new TypeError("Mascota es abstracta: crea un Perro, un Gato o un Ave");
+    }
+    this.nombre = nombre;
+    this.especie = especie;
+    this.peso = peso;   // pasa por el setter, así también se valida aquí
+  }
+
+  get peso() {
+    return this.#peso;
+  }
+
+  set peso(valor) {
+    if (typeof valor !== "number" || Number.isNaN(valor) || valor <= 0) {
+      throw new RangeError("El peso debe ser un número mayor que 0");
+    }
+    this.#peso = valor;
+  }
+
+  // Contrato: toda mascota hace un sonido, pero cada una decide cuál
+  hacerSonido() {
+    throw new Error(`${this.constructor.name} debe implementar hacerSonido()`);
+  }
+
+  describir() {
+    return `${this.nombre} (${this.especie}, ${this.peso} kg)`;
+  }
+}
+
+// ===== Herencia: cada hija reutiliza a Mascota y agrega lo suyo =====
+class Perro extends Mascota {
+  constructor(nombre, peso, raza) {
+    super(nombre, "Perro", peso);   // primero se construye la parte Mascota
+    this.raza = raza;               // luego lo propio del Perro
+  }
+
+  hacerSonido() {
+    return "¡Guau!";
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.raza}`;
+  }
+}
+
+class Gato extends Mascota {
+  constructor(nombre, peso, deInterior) {
+    super(nombre, "Gato", peso);
+    this.deInterior = deInterior;
+  }
+
+  hacerSonido() {
+    return "Miau";
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.deInterior ? "de interior" : "de calle"}`;
+  }
+}
+
+class Ave extends Mascota {
+  constructor(nombre, peso, puedeVolar) {
+    super(nombre, "Ave", peso);
+    this.puedeVolar = puedeVolar;
+  }
+
+  hacerSonido() {
+    return "¡Pío pío!";
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.puedeVolar ? "vuela" : "no vuela"}`;
+  }
+}
+
+// La clínica protege su lista de pacientes
+class Clinica {
+  #pacientes = [];
+
+  registrar(mascota) {
+    if (!(mascota instanceof Mascota)) {
+      throw new TypeError("Solo se pueden registrar mascotas");
+    }
+    this.#pacientes.push(mascota);
+  }
+
+  get pacientes() {
+    return [...this.#pacientes];   // una copia: nadie altera la lista original
+  }
+}
+
+// ===== Datos del formulario para cada especie =====
+const ETIQUETAS = { Perro: "Raza", Gato: "Vive en", Ave: "Vuelo" };
+const OPCIONES = {
+  Perro: ["Labrador", "Criollo", "Pastor alemán"],
+  Gato: ["De interior", "De calle"],
+  Ave: ["Puede volar", "No puede volar"]
+};
+
+// Una "fábrica" por especie: así el formulario no necesita if/else por cada tipo
+const fabricas = {
+  Perro: (nombre, peso, extra) => new Perro(nombre, peso, extra),
+  Gato: (nombre, peso, extra) => new Gato(nombre, peso, extra === "De interior"),
+  Ave: (nombre, peso, extra) => new Ave(nombre, peso, extra === "Puede volar")
+};
+
+// ===== Conexión con la página =====
+const clinica = new Clinica();
+const lista = document.getElementById("lista");
+const mensaje = document.getElementById("mensaje");
+const total = document.getElementById("total");
+const selectTipo = document.getElementById("tipo");
+const etiqueta = document.getElementById("etiqueta");
+const extra = document.getElementById("extra");
+
+function cargarExtra() {
+  const tipo = selectTipo.value;
+  etiqueta.textContent = ETIQUETAS[tipo];
+  extra.innerHTML = "";
+  for (const opcion of OPCIONES[tipo]) {
+    const o = document.createElement("option");
+    o.textContent = opcion;
+    extra.appendChild(o);
+  }
+}
+
+function mostrar(tipo, texto) {
+  mensaje.className = tipo;
+  mensaje.textContent = texto;
+}
+
+function dibujar() {
+  lista.innerHTML = "";
+  for (const m of clinica.pacientes) {
+    const li = document.createElement("li");
+    li.className = "paciente";
+    li.textContent = m.describir();
+    const detalle = document.createElement("small");
+    detalle.textContent = m.hacerSonido();
+    li.appendChild(detalle);
+    lista.appendChild(li);
+  }
+  total.textContent = `Pacientes hoy: ${clinica.pacientes.length}`;
+}
+
+selectTipo.addEventListener("change", cargarExtra);
+
+document.getElementById("formulario").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const tipo = selectTipo.value;
+  const nombre = document.getElementById("nombre").value;
+  const peso = Number(document.getElementById("peso").value);
+
+  try {
+    const mascota = fabricas[tipo](nombre, peso, extra.value);
+    clinica.registrar(mascota);
+    dibujar();
+    mostrar("ok", `${nombre} registrado`);
+  } catch (error) {
+    mostrar("error", error.message);
+  }
+});
+
+cargarExtra();
+dibujar();
+</script>
+<script type="text/plain" data-k="h4">
+<main>
+  <h1>Recepción VetTurnos</h1>
+
+  <form id="formulario">
+    <label>Tipo de mascota
+      <select id="tipo">
+        <option>Perro</option>
+        <option>Gato</option>
+        <option>Ave</option>
+      </select>
+    </label>
+    <label>Nombre
+      <input id="nombre" required>
+    </label>
+    <label>Peso (kg)
+      <input id="peso" type="number" step="0.1" required>
+    </label>
+    <label><span id="etiqueta">Raza</span>
+      <select id="extra"></select>
+    </label>
+    <button type="submit">Registrar</button>
+    <div id="mensaje"></div>
+  </form>
+
+  <ul id="lista"></ul>
+  <p id="total"></p>
+</main>
+</script>
+<script type="text/plain" data-k="j4">
+// ===== Abstracción + Encapsulamiento =====
+class Mascota {
+  #peso;   // campo privado: solo existe dentro de la clase
+
+  constructor(nombre, especie, peso) {
+    if (new.target === Mascota) {
+      throw new TypeError("Mascota es abstracta: crea un Perro, un Gato o un Ave");
+    }
+    this.nombre = nombre;
+    this.especie = especie;
+    this.peso = peso;   // pasa por el setter, así también se valida aquí
+  }
+
+  get peso() {
+    return this.#peso;
+  }
+
+  set peso(valor) {
+    if (typeof valor !== "number" || Number.isNaN(valor) || valor <= 0) {
+      throw new RangeError("El peso debe ser un número mayor que 0");
+    }
+    this.#peso = valor;
+  }
+
+  // Contrato: toda mascota hace un sonido y tiene un valor de consulta,
+  // pero cada una decide cuál
+  hacerSonido() {
+    throw new Error(`${this.constructor.name} debe implementar hacerSonido()`);
+  }
+
+  calcularConsulta() {
+    throw new Error(`${this.constructor.name} debe implementar calcularConsulta()`);
+  }
+
+  describir() {
+    return `${this.nombre} (${this.especie}, ${this.peso} kg)`;
+  }
+}
+
+// ===== Herencia + Polimorfismo: cada hija responde a su manera =====
+class Perro extends Mascota {
+  constructor(nombre, peso, raza) {
+    super(nombre, "Perro", peso);   // primero se construye la parte Mascota
+    this.raza = raza;               // luego lo propio del Perro
+  }
+
+  hacerSonido() {
+    return "¡Guau!";
+  }
+
+  calcularConsulta() {
+    return 30000 + this.peso * 1000;   // depende del peso
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.raza}`;
+  }
+}
+
+class Gato extends Mascota {
+  constructor(nombre, peso, deInterior) {
+    super(nombre, "Gato", peso);
+    this.deInterior = deInterior;
+  }
+
+  hacerSonido() {
+    return "Miau";
+  }
+
+  calcularConsulta() {
+    return 35000;   // tarifa fija
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.deInterior ? "de interior" : "de calle"}`;
+  }
+}
+
+class Ave extends Mascota {
+  constructor(nombre, peso, puedeVolar) {
+    super(nombre, "Ave", peso);
+    this.puedeVolar = puedeVolar;
+  }
+
+  hacerSonido() {
+    return "¡Pío pío!";
+  }
+
+  calcularConsulta() {
+    return this.puedeVolar ? 25000 : 32000;
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.puedeVolar ? "vuela" : "no vuela"}`;
+  }
+}
+
+// La clínica protege su lista y suma sin preguntar de qué tipo es cada mascota
+class Clinica {
+  #pacientes = [];
+
+  registrar(mascota) {
+    if (!(mascota instanceof Mascota)) {
+      throw new TypeError("Solo se pueden registrar mascotas");
+    }
+    this.#pacientes.push(mascota);
+  }
+
+  get pacientes() {
+    return [...this.#pacientes];   // una copia: nadie altera la lista original
+  }
+
+  totalDelDia() {
+    return this.#pacientes.reduce((suma, m) => suma + m.calcularConsulta(), 0);
+  }
+}
+
+// ===== Datos del formulario para cada especie =====
+const ETIQUETAS = { Perro: "Raza", Gato: "Vive en", Ave: "Vuelo" };
+const OPCIONES = {
+  Perro: ["Labrador", "Criollo", "Pastor alemán"],
+  Gato: ["De interior", "De calle"],
+  Ave: ["Puede volar", "No puede volar"]
+};
+
+// Una "fábrica" por especie: así el formulario no necesita if/else por cada tipo
+const fabricas = {
+  Perro: (nombre, peso, extra) => new Perro(nombre, peso, extra),
+  Gato: (nombre, peso, extra) => new Gato(nombre, peso, extra === "De interior"),
+  Ave: (nombre, peso, extra) => new Ave(nombre, peso, extra === "Puede volar")
+};
+
+// ===== Conexión con la página =====
+const clinica = new Clinica();
+const lista = document.getElementById("lista");
+const mensaje = document.getElementById("mensaje");
+const total = document.getElementById("total");
+const selectTipo = document.getElementById("tipo");
+const etiqueta = document.getElementById("etiqueta");
+const extra = document.getElementById("extra");
+
+function dinero(n) {
+  return "$" + n.toLocaleString("es-CO");
+}
+
+function cargarExtra() {
+  const tipo = selectTipo.value;
+  etiqueta.textContent = ETIQUETAS[tipo];
+  extra.innerHTML = "";
+  for (const opcion of OPCIONES[tipo]) {
+    const o = document.createElement("option");
+    o.textContent = opcion;
+    extra.appendChild(o);
+  }
+}
+
+function mostrar(tipo, texto) {
+  mensaje.className = tipo;
+  mensaje.textContent = texto;
+}
+
+// Fíjate: aquí nadie pregunta "¿eres perro o gato?"
+function dibujar() {
+  lista.innerHTML = "";
+  for (const m of clinica.pacientes) {
+    const li = document.createElement("li");
+    li.className = "paciente";
+    li.textContent = m.describir();
+    const detalle = document.createElement("small");
+    detalle.textContent = `${m.hacerSonido()} · Consulta: ${dinero(m.calcularConsulta())}`;
+    li.appendChild(detalle);
+    lista.appendChild(li);
+  }
+  total.textContent = `Pacientes hoy: ${clinica.pacientes.length} · Total consultas: ${dinero(clinica.totalDelDia())}`;
+}
+
+selectTipo.addEventListener("change", cargarExtra);
+
+document.getElementById("formulario").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const tipo = selectTipo.value;
+  const nombre = document.getElementById("nombre").value;
+  const peso = Number(document.getElementById("peso").value);
+
+  try {
+    const mascota = fabricas[tipo](nombre, peso, extra.value);
+    clinica.registrar(mascota);
+    dibujar();
+    mostrar("ok", `${nombre} registrado`);
+  } catch (error) {
+    mostrar("error", error.message);
+  }
+});
+
+cargarExtra();
+dibujar();
+</script>
+<script type="text/plain" data-k="h5">
+<main>
+  <h1>Recepción VetTurnos</h1>
+
+  <form id="formulario">
+    <label>Tipo de mascota
+      <select id="tipo">
+        <option>Perro</option>
+        <option>Gato</option>
+        <option>Ave</option>
+        <option>Conejo</option>
+      </select>
+    </label>
+    <label>Nombre
+      <input id="nombre" required>
+    </label>
+    <label>Peso (kg)
+      <input id="peso" type="number" step="0.1" required>
+    </label>
+    <label><span id="etiqueta">Raza</span>
+      <select id="extra"></select>
+    </label>
+    <button type="submit">Registrar</button>
+    <div id="mensaje"></div>
+  </form>
+
+  <ul id="lista"></ul>
+  <p id="total"></p>
+</main>
+</script>
+<script type="text/plain" data-k="j5">
+// ===== Abstracción + Encapsulamiento =====
+class Mascota {
+  #peso;   // campo privado: solo existe dentro de la clase
+
+  constructor(nombre, especie, peso) {
+    if (new.target === Mascota) {
+      throw new TypeError("Mascota es abstracta: crea un Perro, un Gato o un Ave");
+    }
+    this.nombre = nombre;
+    this.especie = especie;
+    this.peso = peso;   // pasa por el setter, así también se valida aquí
+  }
+
+  get peso() {
+    return this.#peso;
+  }
+
+  set peso(valor) {
+    if (typeof valor !== "number" || Number.isNaN(valor) || valor <= 0) {
+      throw new RangeError("El peso debe ser un número mayor que 0");
+    }
+    this.#peso = valor;
+  }
+
+  // Contrato: toda mascota hace un sonido y tiene un valor de consulta,
+  // pero cada una decide cuál
+  hacerSonido() {
+    throw new Error(`${this.constructor.name} debe implementar hacerSonido()`);
+  }
+
+  calcularConsulta() {
+    throw new Error(`${this.constructor.name} debe implementar calcularConsulta()`);
+  }
+
+  describir() {
+    return `${this.nombre} (${this.especie}, ${this.peso} kg)`;
+  }
+}
+
+// ===== Herencia + Polimorfismo: cada hija responde a su manera =====
+class Perro extends Mascota {
+  constructor(nombre, peso, raza) {
+    super(nombre, "Perro", peso);   // primero se construye la parte Mascota
+    this.raza = raza;               // luego lo propio del Perro
+  }
+
+  hacerSonido() {
+    return "¡Guau!";
+  }
+
+  calcularConsulta() {
+    return 30000 + this.peso * 1000;   // depende del peso
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.raza}`;
+  }
+}
+
+class Gato extends Mascota {
+  constructor(nombre, peso, deInterior) {
+    super(nombre, "Gato", peso);
+    this.deInterior = deInterior;
+  }
+
+  hacerSonido() {
+    return "Miau";
+  }
+
+  calcularConsulta() {
+    return 35000;   // tarifa fija
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.deInterior ? "de interior" : "de calle"}`;
+  }
+}
+
+class Ave extends Mascota {
+  constructor(nombre, peso, puedeVolar) {
+    super(nombre, "Ave", peso);
+    this.puedeVolar = puedeVolar;
+  }
+
+  hacerSonido() {
+    return "¡Pío pío!";
+  }
+
+  calcularConsulta() {
+    return this.puedeVolar ? 25000 : 32000;
+  }
+
+  describir() {
+    return `${super.describir()} · ${this.puedeVolar ? "vuela" : "no vuela"}`;
+  }
+}
+
+class Conejo extends Mascota {
+  constructor(nombre, peso, orejasCaidas) {
+    super(nombre, "Conejo", peso);
+    this.orejasCaidas = orejasCaidas;
+  }
+
+  hacerSonido() {
+    return "(thump, thump)";
+  }
+
+  calcularConsulta() {
+    return 28000;
+  }
+
+  describir() {
+    return `${super.describir()} · orejas ${this.orejasCaidas ? "caídas" : "paradas"}`;
+  }
+}
+
+// La clínica protege su lista y suma sin preguntar de qué tipo es cada mascota
+class Clinica {
+  #pacientes = [];
+
+  registrar(mascota) {
+    if (!(mascota instanceof Mascota)) {
+      throw new TypeError("Solo se pueden registrar mascotas");
+    }
+    this.#pacientes.push(mascota);
+  }
+
+  get pacientes() {
+    return [...this.#pacientes];   // una copia: nadie altera la lista original
+  }
+
+  totalDelDia() {
+    return this.#pacientes.reduce((suma, m) => suma + m.calcularConsulta(), 0);
+  }
+}
+
+// ===== Datos del formulario para cada especie =====
+const ETIQUETAS = { Perro: "Raza", Gato: "Vive en", Ave: "Vuelo", Conejo: "Orejas" };
+const OPCIONES = {
+  Perro: ["Labrador", "Criollo", "Pastor alemán"],
+  Gato: ["De interior", "De calle"],
+  Ave: ["Puede volar", "No puede volar"],
+  Conejo: ["Paradas", "Caídas"]
+};
+
+// Una "fábrica" por especie: así el formulario no necesita if/else por cada tipo
+const fabricas = {
+  Perro: (nombre, peso, extra) => new Perro(nombre, peso, extra),
+  Gato: (nombre, peso, extra) => new Gato(nombre, peso, extra === "De interior"),
+  Ave: (nombre, peso, extra) => new Ave(nombre, peso, extra === "Puede volar"),
+  Conejo: (nombre, peso, extra) => new Conejo(nombre, peso, extra === "Caídas")
+};
+
+// ===== Conexión con la página =====
+const clinica = new Clinica();
+const lista = document.getElementById("lista");
+const mensaje = document.getElementById("mensaje");
+const total = document.getElementById("total");
+const selectTipo = document.getElementById("tipo");
+const etiqueta = document.getElementById("etiqueta");
+const extra = document.getElementById("extra");
+
+function dinero(n) {
+  return "$" + n.toLocaleString("es-CO");
+}
+
+function cargarExtra() {
+  const tipo = selectTipo.value;
+  etiqueta.textContent = ETIQUETAS[tipo];
+  extra.innerHTML = "";
+  for (const opcion of OPCIONES[tipo]) {
+    const o = document.createElement("option");
+    o.textContent = opcion;
+    extra.appendChild(o);
+  }
+}
+
+function mostrar(tipo, texto) {
+  mensaje.className = tipo;
+  mensaje.textContent = texto;
+}
+
+// Fíjate: aquí nadie pregunta "¿eres perro o gato?"
+function dibujar() {
+  lista.innerHTML = "";
+  for (const m of clinica.pacientes) {
+    const li = document.createElement("li");
+    li.className = "paciente";
+    li.textContent = m.describir();
+    const detalle = document.createElement("small");
+    detalle.textContent = `${m.hacerSonido()} · Consulta: ${dinero(m.calcularConsulta())}`;
+    li.appendChild(detalle);
+    lista.appendChild(li);
+  }
+  total.textContent = `Pacientes hoy: ${clinica.pacientes.length} · Total consultas: ${dinero(clinica.totalDelDia())}`;
+}
+
+selectTipo.addEventListener("change", cargarExtra);
+
+document.getElementById("formulario").addEventListener("submit", (e) => {
+  e.preventDefault();
+  const tipo = selectTipo.value;
+  const nombre = document.getElementById("nombre").value;
+  const peso = Number(document.getElementById("peso").value);
+
+  try {
+    const mascota = fabricas[tipo](nombre, peso, extra.value);
+    clinica.registrar(mascota);
+    dibujar();
+    mostrar("ok", `${nombre} registrado`);
+  } catch (error) {
+    mostrar("error", error.message);
+  }
+});
+
+cargarExtra();
+dibujar();
+</script>
+
+
+<script type="text/plain" data-k="readme">
+# 🐾 VetTurnos
+
+Recepción web de una veterinaria para registrar perros, gatos, aves y conejos. Proyecto de práctica de **Programación Orientada a Objetos** en JavaScript — SENA · ADSO.
+
+## ¿Qué hace?
+
+- Registra mascotas con nombre, peso y un dato propio de cada especie.
+- Valida que el peso sea un número mayor que 0.
+- Calcula el valor de cada consulta y el total del día.
+
+## Pilares de POO aplicados
+
+| Pilar | Dónde se ve |
+|---|---|
+| Abstracción | `Mascota` no se puede instanciar; solo define el contrato |
+| Encapsulamiento | `#peso` con get/set en `Mascota` y `#pacientes` en `Clinica` |
+| Herencia | `Perro`, `Gato`, `Ave` y `Conejo` extienden `Mascota` |
+| Polimorfismo | `hacerSonido()` y `calcularConsulta()` responden distinto en cada clase |
+
+## Tecnologías
+
+HTML5, CSS3 y JavaScript (ES2022). No necesita instalación ni librerías.
+
+## Cómo ejecutarlo
+
+1. Clona el repositorio:
+   ```
+   git clone https://github.com/TU_USUARIO/vet-turnos.git
+   ```
+2. Abre el archivo `index.html` con doble clic en tu navegador.
+
+## Estructura
+
+```
+vet-turnos/
+├── index.html
+└── README.md
+```
+
+## Historial por fases
+
+Cada fase del proyecto quedó guardada en un commit:
+
+1. Estructura base de la página y formulario
+2. Abstracción: `Mascota`, `Perro` y `Gato`
+3. Encapsulamiento: peso validado y lista protegida con `Clinica`
+4. Herencia: `Ave` y datos propios por especie
+5. Polimorfismo: `calcularConsulta()` y total del día
+6. Reto: `Conejo` sin modificar el código existente
+
+## Autor
+
+Tu Nombre Apellido · Ficha XXXXXXX · SENA — Análisis y Desarrollo de Software
+</script>
+
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var show = function (v) { if (v === undefined) return 'undefined'; try { var s = JSON.stringify(v); return s === undefined ? String(v) : s; } catch (e) { return String(v); } };
+  var txt = function (k) { var el = $('script[data-k="' + k + '"]'); return el ? el.textContent.replace(/^\n/, '').replace(/\s+$/, '') : ''; };
+  var CSS = txt('css');
+  var H = [], J = [];
+  for (var q = 0; q < 6; q++) { H.push(txt('h' + q)); J.push(txt('j' + q)); }
+
+  /* ---------- diferencias línea a línea (LCS) ---------- */
+  function diff(prev, cur) {
+    var a = prev.split('\n'), b = cur.split('\n'), n = a.length, m = b.length, i, j;
+    var dp = []; for (i = 0; i <= n; i++) { dp.push(new Array(m + 1).fill(0)); }
+    for (i = n - 1; i >= 0; i--) for (j = m - 1; j >= 0; j--) dp[i][j] = a[i] === b[j] ? dp[i + 1][j + 1] + 1 : Math.max(dp[i + 1][j], dp[i][j + 1]);
+    var isNew = new Array(m).fill(true); i = 0; j = 0;
+    while (i < n && j < m) {
+      if (a[i] === b[j]) { isNew[j] = false; i++; j++; }
+      else if (dp[i + 1][j] >= dp[i][j + 1]) i++; else j++;
+    }
+    return { lines: b, isNew: isNew };
+  }
+  function pre(title, text, prevText) {
+    var lines, flags;
+    if (prevText == null) { lines = text.split('\n'); flags = lines.map(function () { return false; }); }
+    else { var d = diff(prevText, text); lines = d.lines; flags = d.isNew; }
+    return '<div class="codewrap"><div class="cap">' + title + '</div><pre><code>' + lines.map(function (t, k) {
+      return '<span class="l' + (flags[k] ? ' n' : '') + '">' + (esc(t) || ' ') + '</span>';
+    }).join('') + '</code></pre></div>';
+  }
+  function block(title, text, prevText) {
+    if (prevText != null && text === prevText) return '<details class="fold"><summary>' + title + ' (sin cambios en este paso)</summary>' + pre(title, text, null) + '</details>';
+    return pre(title, text, prevText);
+  }
+  function fullFile(i) {
+    return '<!DOCTYPE html>\n<html lang="es">\n<head>\n<meta charset="UTF-8">\n<meta name="viewport" content="width=device-width, initial-scale=1.0">\n<title>Recepción VetTurnos</title>\n<style>\n' + CSS + '\n</style>\n</head>\n<body>\n' + H[i] + '\n\n<script>\n' + J[i] + '\n</scr' + 'ipt>\n</body>\n</html>\n';
+  }
+
+  /* ---------- consola de la vista previa ---------- */
+  function Log(el) { this.el = el; this.clear(); }
+  Log.prototype.clear = function () { this.el.innerHTML = '<div class="empty">Pulsa una de las pruebas de arriba y mira aquí qué respondió tu código.</div>'; };
+  Log.prototype.add = function (kind, src, msg) {
+    if ($('.empty', this.el)) this.el.innerHTML = '';
+    var d = document.createElement('div'); d.className = 'ln ' + kind;
+    d.innerHTML = '<span class="mk">' + (kind === 'ok' ? '✓' : '✗') + '</span><span><span class="src">' + esc(src) + '</span><br>' + esc(msg) + '</span>';
+    this.el.appendChild(d); this.el.scrollTop = this.el.scrollHeight;
+  };
+
+  /* ---------- vista previa: corre el código real del paso dentro de un Shadow DOM ---------- */
+  var NAMES = ['Mascota', 'Perro', 'Gato', 'Ave', 'Conejo', 'Clinica', 'clinica', 'pacientes'];
+  function mount(host, i, log) {
+    host.innerHTML = '';
+    var box = document.createElement('div'); host.appendChild(box);
+    var sr = box.attachShadow({ mode: 'open' });
+    var css = CSS.replace(/:root/g, ':host').replace(/\bbody\b/g, ':host');
+    sr.innerHTML = '<style>:host{display:block}' + css + '</style>' + H[i];
+    var doc = {
+      getElementById: function (id) { return sr.getElementById(id); },
+      querySelector: function (s) { return sr.querySelector(s); },
+      querySelectorAll: function (s) { return sr.querySelectorAll(s); },
+      createElement: function (t) { return document.createElement(t); }
+    };
+    var ret = 'return {' + NAMES.map(function (n) { return n + ': (typeof ' + n + ' !== "undefined" ? ' + n + ' : undefined)'; }).join(',') + '};';
+    var ns = {};
+    try { ns = new Function('document', J[i] + '\n' + ret)(doc); }
+    catch (e) { log.add('err', 'Al cargar el código', e.name + ': ' + e.message); }
+    return { sr: sr, ns: ns };
+  }
+  function runForm(pv, f, log) {
+    var g = function (id) { return pv.sr.getElementById(id); };
+    g('tipo').value = f.tipo; g('tipo').dispatchEvent(new Event('change', { bubbles: true }));
+    if (f.extra && g('extra')) g('extra').value = f.extra;
+    g('nombre').value = f.nombre; g('peso').value = String(f.peso);
+    g('formulario').dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+    var m = g('mensaje');
+    var bad = m && /error/.test(m.className);
+    log.add(bad ? 'err' : 'ok', f.tipo + ' · ' + f.nombre + ' · ' + f.peso + ' kg' + (f.extra ? ' · ' + f.extra : ''), m ? m.textContent : '(sin mensaje)');
+  }
+
+  /* ---------- contenido de los pasos ---------- */
+  var STEPS = [
+    {
+      tag: 'Base', titulo: 'Prepara la página',
+      logro: 'Una página con un formulario para registrar pacientes y una lista vacía donde aparecerán. Todavía sin lógica: solo comprobamos que todo está conectado.',
+      concepto: '<b>HTML, CSS y JavaScript.</b> HTML da la estructura, CSS el aspecto y JavaScript el comportamiento. La programación orientada a objetos vive en JavaScript, así que en los siguientes pasos solo cambiaremos esa parte.',
+      pasos: ['Abre en VS Code la carpeta <code>vet-turnos</code> que clonaste en «Antes de empezar» y crea dentro un archivo <code>index.html</code>. Si todavía no usas GitHub, crea una carpeta con ese nombre.', 'Escribe o copia el archivo completo. Los estilos van dentro de <code>&lt;style&gt;</code> y no cambiarán más.', 'Abre <code>index.html</code> con doble clic: se abrirá en tu navegador.', 'Escribe un nombre y un peso, pulsa <b>Registrar</b> y verifica que aparece el mensaje.'],
+      checks: ['Veo el formulario en el navegador', 'Al pulsar Registrar aparece el mensaje de prueba'],
+      pensar: ['¿Por qué el código del formulario empieza con <code>e.preventDefault()</code>?', 'Porque por defecto un formulario recarga la página al enviarse. <code>preventDefault()</code> lo evita para que sea nuestro JavaScript el que decida qué hacer.'],
+      pruebas: [{ label: 'Registrar a Rocky', form: { tipo: 'Perro', nombre: 'Rocky', peso: 18 } }]
+    },
+    {
+      tag: 'Abstracción', titulo: 'Una clase general que nadie puede crear',
+      logro: 'Registrar perros y gatos y mostrar el sonido de cada uno, sobre una clase abstracta <code>Mascota</code>.',
+      concepto: '<b>Abstracción: quedarse con lo esencial.</b> En la clínica nadie atiende a una "mascota a secas": llega un perro o un gato. Por eso <code>Mascota</code> no se puede instanciar y solo define el contrato: toda mascota hace un sonido, y cada una decide cuál.',
+      pasos: ['Reemplaza el JavaScript del paso anterior por el nuevo código.', 'Escribe <code>Mascota</code> con la revisión de <code>new.target</code> y un método <code>hacerSonido()</code> que lanza un error.', 'Crea <code>Perro</code> y <code>Gato</code> con <code>extends</code> y su propio <code>hacerSonido()</code>.', 'Conecta las clases con el formulario: crea la mascota, guárdala en <code>pacientes</code> y llama a <code>dibujar()</code>.'],
+      nota: 'Fíjate en un error a propósito: en este paso el peso -5 se acepta. Lo arreglamos en el siguiente paso.',
+      checks: ['Registro un perro y un gato y cada uno muestra su sonido', 'Entiendo por qué <code>new Mascota()</code> lanza un error'],
+      pensar: ['¿Qué pasaría si creas una clase <code>Pez</code> que extiende <code>Mascota</code> pero olvida <code>hacerSonido()</code>?', 'Todo funciona hasta que la lista intenta mostrar el sonido del pez: ahí se lanza "Pez debe implementar hacerSonido()". El contrato obliga a completar lo que falta y falla con un mensaje claro.'],
+      pruebas: [
+        { label: 'Perro Rocky 18 kg', form: { tipo: 'Perro', nombre: 'Rocky', peso: 18 } },
+        { label: 'Gato Michi 4 kg', form: { tipo: 'Gato', nombre: 'Michi', peso: 4 } },
+        { label: 'Perro con peso -5 (se acepta: es el error del paso)', form: { tipo: 'Perro', nombre: 'Fantasma', peso: -5 } },
+        { label: 'new Mascota("X", 5)', src: 'new Mascota("X", 5)', js: function (ns) { return new ns.Mascota('X', 5); } }
+      ]
+    },
+    {
+      tag: 'Encapsulamiento', titulo: 'Proteger el peso y la lista',
+      logro: 'Que el peso nunca quede inválido y que nadie pueda alterar la lista de pacientes desde afuera.',
+      concepto: '<b>Encapsulamiento: el dato adentro y un portero que decide.</b> <code>#peso</code> es privado: se lee con <code>get</code> y solo cambia con <code>set</code>, que valida. <code>Clinica</code> guarda <code>#pacientes</code> y entrega una <em>copia</em>, no la lista original.',
+      pasos: ['En <code>Mascota</code>, agrega el campo privado <code>#peso</code>, el <code>get peso</code> y el <code>set peso</code> que lanza <code>RangeError</code>.', 'Crea la clase <code>Clinica</code> con <code>#pacientes</code>, <code>registrar()</code> y el getter <code>pacientes</code> que devuelve una copia.', 'Reemplaza el arreglo <code>pacientes</code> por <code>const clinica = new Clinica()</code>.', 'Envuelve el registro en <code>try / catch</code> para mostrar los errores en el mensaje.', 'Agrega <code>&lt;p id="total"&gt;</code> al HTML.'],
+      checks: ['El peso -5 se rechaza con un mensaje en rojo', 'Entiendo por qué <code>pacientes</code> devuelve una copia de la lista'],
+      pensar: ['¿Por qué el constructor hace <code>this.peso = peso</code> en vez de guardar directo en <code>#peso</code>?', 'Porque así la asignación pasa por el setter y se valida también al crear la mascota. Si guardara directo en <code>#peso</code>, un peso inválido entraría por el constructor.'],
+      pruebas: [
+        { label: 'Perro Max con peso -5', form: { tipo: 'Perro', nombre: 'Max', peso: -5 } },
+        { label: 'Gato Michi 4 kg', form: { tipo: 'Gato', nombre: 'Michi', peso: 4 } },
+        { label: 'clinica.pacientes.push("intruso")', src: 'clinica.pacientes.push("intruso")', js: function (ns) { var a = ns.clinica.pacientes.length; ns.clinica.pacientes.push('intruso'); return 'antes: ' + a + ' pacientes, después: ' + ns.clinica.pacientes.length + ' (la lista original no cambió)'; } },
+        { label: 'new Perro("Max", 0)', src: 'new Perro("Max", 0)', js: function (ns) { return new ns.Perro('Max', 0); } }
+      ]
+    },
+    {
+      tag: 'Herencia', titulo: 'Cada especie con lo suyo',
+      logro: 'Perros, gatos y aves con datos propios (raza, dónde vive, si vuela), reutilizando todo lo de <code>Mascota</code>.',
+      concepto: '<b>Herencia: una clase nueva parte de otra y agrega solo lo suyo.</b> <code>super(...)</code> construye primero la parte <code>Mascota</code>; <code>super.describir()</code> reutiliza lo que el padre ya sabe hacer. Si una hija "es un tipo de" Mascota, hereda.',
+      pasos: ['En <code>Mascota</code> agrega <code>especie</code> al constructor y el método <code>describir()</code>.', 'En <code>Perro</code>, <code>Gato</code> y la nueva clase <code>Ave</code>: constructor con <code>super(nombre, "Especie", peso)</code> y un atributo propio.', 'Sobrescribe <code>describir()</code> en cada hija reutilizando <code>super.describir()</code>.', 'En el HTML agrega la opción <code>Ave</code> y un campo <code>extra</code> que cambia según la especie.', 'Usa el objeto <code>fabricas</code> para crear cada mascota sin un <code>if / else</code> por especie.'],
+      checks: ['Registro un ave y se muestra si vuela o no', 'Identifico las líneas donde se usa <code>super</code>'],
+      pensar: ['¿Por qué <code>super(...)</code> debe ir antes de usar <code>this</code> en el constructor de <code>Perro</code>?', 'Porque <code>this</code> no existe hasta que el constructor del padre lo crea. Si lo usas antes, JavaScript lanza un <code>ReferenceError</code>.'],
+      pruebas: [
+        { label: 'Perro Rocky 18 kg · Labrador', form: { tipo: 'Perro', nombre: 'Rocky', peso: 18, extra: 'Labrador' } },
+        { label: 'Gato Luna 3.5 kg · De calle', form: { tipo: 'Gato', nombre: 'Luna', peso: 3.5, extra: 'De calle' } },
+        { label: 'Ave Piolín 0.3 kg · Puede volar', form: { tipo: 'Ave', nombre: 'Piolín', peso: 0.3, extra: 'Puede volar' } },
+        { label: 'new Ave("Pingu", 4.5, false) instanceof Mascota', src: 'new Ave("Pingu", 4.5, false) instanceof Mascota', js: function (ns) { return new ns.Ave('Pingu', 4.5, false) instanceof ns.Mascota; } }
+      ]
+    },
+    {
+      tag: 'Polimorfismo', titulo: 'Misma orden, distinta respuesta',
+      logro: 'Calcular el valor de cada consulta y el total del día sin preguntar nunca de qué tipo es cada mascota.',
+      concepto: '<b>Polimorfismo: cada objeto responde a su manera.</b> <code>calcularConsulta()</code> existe en todas las mascotas, pero cada una lo calcula distinto. <code>dibujar()</code> y <code>totalDelDia()</code> solo hacen la llamada; no usan <code>if</code> ni <code>instanceof</code>.',
+      pasos: ['Agrega <code>calcularConsulta()</code> al contrato de <code>Mascota</code> (lanza un error, como <code>hacerSonido()</code>).', 'Implementa el método en <code>Perro</code> (30.000 más 1.000 por kilo), <code>Gato</code> (35.000) y <code>Ave</code> (25.000, o 32.000 si no vuela).', 'Agrega <code>totalDelDia()</code> a <code>Clinica</code> con <code>reduce</code>.', 'Muestra el costo de cada paciente y el total en <code>dibujar()</code>.'],
+      checks: ['El total suma perro, gato y ave correctamente', 'Encuentro que <code>dibujar()</code> y <code>totalDelDia()</code> no usan <code>if</code> ni <code>instanceof</code>'],
+      pensar: ['Si mañana llega un <code>Conejo</code>, ¿qué funciones tendrías que modificar para que el total lo incluya?', 'Ninguna: ni <code>dibujar()</code> ni <code>totalDelDia()</code>. Solo crearías la clase <code>Conejo</code> con su <code>calcularConsulta()</code>. Lo comprobamos en el reto.'],
+      pruebas: [
+        { label: 'Perro Rocky 18 kg (esperado $48.000)', form: { tipo: 'Perro', nombre: 'Rocky', peso: 18, extra: 'Labrador' } },
+        { label: 'Gato Michi 4 kg (esperado $35.000)', form: { tipo: 'Gato', nombre: 'Michi', peso: 4, extra: 'De interior' } },
+        { label: 'Ave Pingu 4.5 kg sin volar (esperado $32.000)', form: { tipo: 'Ave', nombre: 'Pingu', peso: 4.5, extra: 'No puede volar' } },
+        { label: 'clinica.totalDelDia()', src: 'clinica.totalDelDia()', js: function (ns) { return ns.clinica.totalDelDia(); } }
+      ]
+    },
+    {
+      tag: 'Reto', titulo: 'Llega un conejo',
+      logro: 'Agregar una especie nueva, el <code>Conejo</code>, sin tocar <code>dibujar()</code> ni <code>totalDelDia()</code>.',
+      concepto: '<b>La prueba de fuego.</b> Si los cuatro pilares están bien aplicados, extender el sistema es <em>agregar</em> clases, no editar las que ya funcionan. Intenta el reto por tu cuenta antes de abrir la solución.',
+      pasos: ['Crea <code>Conejo</code>: hereda de <code>Mascota</code>, con <code>orejasCaidas</code>, sonido <code>"(thump, thump)"</code> y consulta de 28.000.', 'Regístralo en <code>ETIQUETAS</code>, <code>OPCIONES</code> y <code>fabricas</code>, y agrega la opción al select del HTML.', 'Comprueba que <code>dibujar()</code> y <code>totalDelDia()</code> quedaron exactamente igual.', 'Abre la solución y compara: solo se agregaron líneas, no se modificó ninguna del paso anterior.'],
+      checks: ['Mi Conejo aparece en la lista con su costo', 'No tuve que modificar <code>dibujar()</code> ni <code>totalDelDia()</code>'],
+      pensar: ['Reto extra: ¿cómo agregarías una clase <code>Vacuna</code> con stock privado y un botón "Aplicar vacuna" en cada paciente?', 'Crea <code>Vacuna</code> con <code>#stock</code> y un <code>aplicar()</code> que valide que queden dosis (como en el laboratorio). Cada <code>Mascota</code> puede tener una lista de vacunas (composición) y <code>dibujar()</code> agrega el botón a cada paciente.'],
+      solucion: true,
+      pruebas: [
+        { label: 'Conejo Copito 1.8 kg · Caídas', form: { tipo: 'Conejo', nombre: 'Copito', peso: 1.8, extra: 'Caídas' } },
+        { label: 'Perro Rocky 18 kg', form: { tipo: 'Perro', nombre: 'Rocky', peso: 18, extra: 'Labrador' } }
+      ]
+    }
+  ];
+
+  /* ---------- GitHub: repositorio, commits por fase y README ---------- */
+  var GIT = [
+    { msg: 'feat: estructura base de la pagina y formulario de registro',
+      nota: 'Es tu primer commit de código. Un <b>commit</b> es una foto del proyecto en este momento, con un mensaje que explica qué hiciste. <code>git push</code> sube esa foto a GitHub.' },
+    { msg: 'feat: abstraccion con la clase Mascota, Perro y Gato',
+      nota: 'Antes de guardar, mira qué cambió: <code>git diff</code> muestra en verde las líneas nuevas, igual que esta guía (pulsa <code>q</code> para salir). Si algo no lo reconoces, no lo subas todavía.' },
+    { msg: 'feat: encapsulamiento del peso y de la lista con la clase Clinica',
+      nota: 'Este commit corrige el peso -5 que dejamos pasar a propósito. Un buen historial cuenta esa historia: un paso muestra el problema y el siguiente lo resuelve.' },
+    { msg: 'feat: herencia con Perro, Gato y Ave y datos propios por especie',
+      nota: 'Un commit por fase te deja puntos de control. Si más adelante rompes algo, <code>git log --oneline</code> te ayuda a ubicar el último momento en que todo funcionaba.' },
+    { msg: 'feat: polimorfismo con calcularConsulta y total del dia',
+      nota: 'Fíjate en el mensaje: dentro de un mes entenderás qué hizo este commit solo con leer su título. Por eso conviene que diga <em>qué</em> hiciste, no solo «cambios».' },
+    { msg: 'feat: reto Conejo sin modificar dibujar ni totalDelDia',
+      nota: 'Cierra la fase de código. Antes de guardar, revisa con <code>git diff</code>: si aplicaste bien los pilares, no debe haber líneas rojas (borradas) dentro de <code>dibujar()</code> ni de <code>totalDelDia()</code>.' }
+  ];
+
+  function gitCmds(k, msg) {
+    return (k > 0 ? 'git status\ngit diff\n' : 'git status\n') + 'git add index.html\ngit commit -m "' + msg + '"\ngit push';
+  }
+
+  var SETUP = {
+    kind: 'info', nav: 'Antes de empezar', circ: 'G', tag: 'GitHub', num: 'Antes de empezar',
+    titulo: 'Crea tu repositorio en GitHub',
+    logro: 'Una cuenta de GitHub, Git instalado y configurado, y un repositorio <code>vet-turnos</code> creado en la nube y clonado en tu computador, listo para recibir un commit por cada paso de la guía.',
+    concepto: '<b>Git guarda la historia; GitHub la publica.</b> <code>Git</code> es el programa que corre en tu computador y toma «fotos» (commits) de tu proyecto. <code>GitHub</code> es el sitio donde guardas una copia en la nube, la compartes con tu instructor y construyes tu portafolio. Tu rutina será: escribir código → <code>commit</code> (guardar la foto) → <code>push</code> (subirla).',
+    req: [
+      '<b>Cuenta en GitHub</b> (gratis) en <code>github.com</code>. Usa un correo que revises y verifícalo cuando GitHub te escriba.',
+      '<b>Git instalado.</b> Descárgalo de <code>git-scm.com</code> (en Windows, instala «Git for Windows» con las opciones por defecto). Comprueba con <code>git --version</code>.',
+      '<b>Visual Studio Code</b> (o tu editor) y un navegador.',
+      '<b>Una terminal.</b> En VS Code: menú <b>Terminal → Nuevo terminal</b>. En Windows también sirve «Git Bash», que se instala con Git.',
+      '<b>Cómo te reconoce GitHub al hacer push.</b> GitHub ya no acepta la contraseña de tu cuenta en la terminal. En Windows y macOS, la primera vez que hagas <code>git push</code> se abre una ventana del navegador para iniciar sesión. Si te pide una contraseña, usa un <em>token de acceso personal</em> (GitHub → Settings → Developer settings → Personal access tokens).',
+      'Conexión a internet para clonar y subir los cambios.'
+    ],
+    pasos: [
+      'Abre una terminal y dile a Git quién eres (una sola vez por computador). Usa el mismo correo de tu cuenta de GitHub.',
+      'En <code>github.com</code>, pulsa <b>+</b> (arriba a la derecha) → <b>New repository</b>.',
+      'Completa: nombre <code>vet-turnos</code>, una descripción corta (por ejemplo «Recepción de una veterinaria con POO en JavaScript»), visibilidad <b>Public</b> (o Private si tu instructor lo prefiere) y marca <b>Add a README file</b>. Pulsa <b>Create repository</b>.',
+      'Copia la dirección del repositorio: botón verde <b>Code</b> → pestaña <b>HTTPS</b>.',
+      'En la terminal, ve a la carpeta donde guardas tus trabajos y clona el repositorio (cambia <code>TU_USUARIO</code> por tu usuario de GitHub). Se crea la carpeta <code>vet-turnos</code> con el README adentro.',
+      'Entra a la carpeta y verifica: <code>git status</code> debe decir que no hay nada por guardar y <code>git log --oneline</code> debe mostrar el commit inicial creado por GitHub. Ábrela en VS Code con <code>code .</code>.'
+    ],
+    nota: 'Desde aquí, todo el trabajo de la guía ocurre dentro de la carpeta <code>vet-turnos</code> que acabas de clonar. Los comandos de Git siempre se ejecutan con la terminal ubicada en esa carpeta.',
+    cmds: [
+      { cap: 'Terminal · paso 1 · identidad (una sola vez)', text: 'git --version\ngit config --global user.name "Tu Nombre Apellido"\ngit config --global user.email "tu-correo@ejemplo.com"\ngit config --global init.defaultBranch main' },
+      { cap: 'Terminal · pasos 5 y 6 · clonar y verificar', text: '# Ve a la carpeta donde guardas tus trabajos, por ejemplo: cd Documents\ngit clone https://github.com/TU_USUARIO/vet-turnos.git\ncd vet-turnos\ngit status\ngit log --oneline\ncode .' }
+    ],
+    extra: '<h3>Cómo guardarás cada fase</h3><ol class="todo"><li>Escribe y prueba el código del paso.</li><li><code>git status</code> y <code>git diff</code>: revisa qué cambió.</li><li><code>git add</code> + <code>git commit -m "..."</code>: guarda la foto con un mensaje claro.</li><li><code>git push</code>: súbela a GitHub y recarga el repositorio para verla.</li></ol><p class="note">Los mensajes empiezan con <code>feat:</code> (algo nuevo), <code>fix:</code> (una corrección) o <code>docs:</code> (documentación), seguido de una frase corta que diga <em>qué</em> hiciste. Evita mensajes como «cambios» o «listo». En los mensajes sin tildes evitas problemas de codificación en algunas terminales de Windows.</p>',
+    checks: [
+      'Tengo cuenta en GitHub y <code>git --version</code> responde en mi terminal',
+      'Configuré mi nombre y correo con <code>git config</code>',
+      'Mi repositorio <code>vet-turnos</code> existe en GitHub y está clonado en mi computador'
+    ],
+    pensar: ['¿Cuál es la diferencia entre <code>git commit</code> y <code>git push</code>?', '<code>commit</code> guarda la foto solo en tu computador; <code>push</code> la sube a GitHub. Podrías acumular varios commits y subirlos juntos, pero en esta guía haces push en cada fase para que tu instructor vea tu avance y para tener una copia segura en la nube.']
+  };
+
+  var CIERRE = {
+    kind: 'info', nav: 'Cierre', circ: 'R', tag: 'README', num: 'Cierre del proyecto',
+    titulo: 'Documenta y publica tu proyecto',
+    logro: 'Un README que presente tu proyecto, un historial con un commit por fase y una versión final marcada, listo para entregar el enlace a tu instructor.',
+    concepto: '<b>El README es la portada de tu repositorio.</b> GitHub lo muestra debajo de la lista de archivos. Quien llegue a tu proyecto (un instructor, un compañero, una empresa) lo lee primero: qué hace, con qué se hizo y cómo ejecutarlo. Está escrito en <em>Markdown</em>: <code>#</code> para títulos, <code>-</code> para listas y <code>`código`</code> para fragmentos.',
+    pasos: [
+      'Abre <code>README.md</code> en VS Code y reemplaza todo su contenido por la plantilla de abajo. Cambia <code>TU_USUARIO</code>, tu nombre y el número de tu ficha.',
+      'Opcional: con la app funcionando, toma una captura de pantalla, guárdala como <code>docs/captura.png</code> y agrega bajo el título la línea <code>![Captura de VetTurnos](docs/captura.png)</code>. Si lo haces, usa <code>git add README.md docs</code>.',
+      'Guarda el cambio con un commit de tipo <code>docs:</code> y súbelo.',
+      'Revisa tu historial: debe verse un commit por cada fase. Recarga el repositorio en GitHub: el README aparece debajo de la lista de archivos.',
+      'Marca la versión final con una etiqueta (<em>tag</em>) y súbela. Aparecerá en la sección <b>Tags</b> de GitHub.',
+      'Opcional: publica la página con GitHub Pages en <b>Settings → Pages</b> → <b>Deploy from a branch</b> → rama <code>main</code>, carpeta <code>/ (root)</code> → <b>Save</b>. En un par de minutos tu app quedará en <code>https://TU_USUARIO.github.io/vet-turnos/</code>.'
+    ],
+    nota: 'GitHub Pages en cuentas gratuitas requiere repositorio público. Entrega a tu instructor el enlace de tu repositorio (la dirección que ves en el navegador al abrirlo).',
+    cmds: [
+      { cap: 'README.md · plantilla para reemplazar el contenido', text: txt('readme') },
+      { cap: 'Terminal · pasos 3 y 4 · commit del README y revisión del historial', text: 'git add README.md\ngit commit -m "docs: agregar README con descripcion, pilares de POO y como ejecutar"\ngit push\ngit log --oneline' },
+      { cap: 'Terminal · paso 5 · versión final', text: 'git tag -a v1.0 -m "VetTurnos completo con los cuatro pilares de POO"\ngit push origin v1.0' }
+    ],
+    extra: '<h3>Qué debe mostrar tu historial</h3><p class="note">Con <code>git log --oneline</code> verás los más recientes arriba. Al terminar deben aparecer: el commit del README, los seis commits de fases (de la estructura base al reto del Conejo) y, al final de la lista, el commit inicial creado por GitHub.</p>',
+    checks: [
+      'La portada de mi repositorio muestra el README con su formato',
+      'Mi historial (<code>git log --oneline</code>) tiene un commit por cada fase',
+      'Subí la etiqueta <code>v1.0</code> y tengo el enlace del repositorio para entregar'
+    ],
+    pensar: ['¿Por qué es mejor un commit por fase que uno solo al final?', 'Cada commit es un punto al que puedes volver y deja constancia de cómo construiste el proyecto. Si algo se rompe, sabes exactamente en qué fase pasó; y tu instructor ve tu proceso, no solo el resultado.']
+  };
+
+  STEPS.forEach(function (s, k) {
+    s.ci = k; s.git = GIT[k]; s.circ = String(k); s.nav = k === 0 ? 'Punto de partida' : 'Paso ' + k;
+    s.checks.push('Guardé este avance con un commit y lo veo en mi repositorio de GitHub');
+  });
+  STEPS.unshift(SETUP);
+  STEPS.push(CIERRE);
+
+  /* ---------- estado ---------- */
+  var KEY = 'guia-vet-v2', S = { checks: {} }, cur = 0;
+  try { var raw = localStorage.getItem(KEY); if (raw) S.checks = JSON.parse(raw).checks || {}; } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function stepDone(i) { return STEPS[i].checks.every(function (c, k) { return S.checks[i + '-' + k]; }); }
+
+  var nav = $('#nav'), main = $('#main');
+  function drawNav() {
+    nav.innerHTML = STEPS.map(function (s, i) {
+      var d = stepDone(i);
+      return '<button class="navitem' + (d ? ' done' : '') + '" data-i="' + i + '"' + (i === cur ? ' aria-current="true"' : '') + '><span class="n">' + (d ? '✓' : s.circ) + '</span><span class="nt">' + s.nav + '<small>' + s.tag + '</small></span></button>';
+    }).join('');
+    Array.prototype.forEach.call(nav.children, function (b) { b.onclick = function () { open(Number(b.dataset.i)); }; });
+    var n = STEPS.filter(function (s, i) { return stepDone(i); }).length;
+    $('#prog-txt').textContent = n + ' de ' + STEPS.length + ' pasos';
+    $('#prog-bar').style.width = (n / STEPS.length * 100) + '%';
+  }
+
+  function copyText(text, btn) {
+    var done = function (ok) { var old = btn.dataset.l || btn.textContent; btn.dataset.l = old; btn.textContent = ok ? '¡Copiado!' : 'Selecciona y copia manualmente'; setTimeout(function () { btn.textContent = old; }, 1800); };
+    var fallback = function () {
+      var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+      var ok = false; try { ok = document.execCommand('copy'); } catch (e) {} document.body.removeChild(ta); done(ok);
+    };
+    try { navigator.clipboard.writeText(text).then(function () { done(true); }, fallback); } catch (e) { fallback(); }
+  }
+
+  function cmdBlock(cap, text, k) {
+    return '<div class="inner"><div class="codewrap"><div class="cap">' + cap + '</div><pre><code>' + text.split('\n').map(function (t) {
+      return '<span class="l">' + (esc(t) || ' ') + '</span>';
+    }).join('') + '</code></pre></div><div class="row"><button class="act" data-cmd="' + k + '">Copiar</button></div></div>';
+  }
+  function bindCmds(texts) {
+    Array.prototype.forEach.call(main.querySelectorAll('[data-cmd]'), function (b) {
+      b.onclick = function () { copyText(texts[b.dataset.cmd], b); };
+    });
+  }
+
+  function openInfo(i, st) {
+    var texts = {};
+    var cmdHtml = st.cmds.map(function (c, k) { texts[k] = c.text; return cmdBlock(c.cap, c.text, k); }).join('');
+    main.innerHTML =
+      '<article class="step">' +
+        '<div class="exhead"><span class="num">' + st.num + '</span><span class="tag">' + st.tag + '</span><span class="state" data-state></span></div>' +
+        '<h2>' + st.titulo + '</h2>' +
+        '<div class="card"><h3>Qué vas a lograr</h3><p>' + st.logro + '</p></div>' +
+        '<div class="card concept"><p>' + st.concepto + '</p></div>' +
+        (st.req ? '<div class="card"><h3>Qué necesitas antes</h3><ul class="req">' + st.req.map(function (r) { return '<li>' + r + '</li>'; }).join('') + '</ul></div>' : '') +
+        '<div class="card"><h3>Haz esto</h3><ol class="todo">' + st.pasos.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ol>' + (st.nota ? '<p class="note">' + st.nota + '</p>' : '') + '</div>' +
+        '<div class="inner"><h3>Comandos y archivos</h3>' + cmdHtml + '</div>' +
+        (st.extra ? '<div class="card">' + st.extra + '</div>' : '') +
+        '<div class="card"><h3>Punto de control</h3><ul class="checks">' + st.checks.map(function (c, k) {
+          return '<li><label><input type="checkbox" data-c="' + k + '"' + (S.checks[i + '-' + k] ? ' checked' : '') + '><span>' + c + '</span></label></li>';
+        }).join('') + '</ul></div>' +
+        '<details class="think"><summary>Para pensar: ' + st.pensar[0] + '</summary><p>' + st.pensar[1] + '</p></details>' +
+        '<div class="navbtns">' + (i > 0 ? '<button class="act" data-prev>← Paso anterior</button>' : '<span></span>') + (i < STEPS.length - 1 ? '<button class="act primary" data-next>Siguiente paso →</button>' : '<span></span>') + '</div>' +
+      '</article>';
+    bindCmds(texts);
+    Array.prototype.forEach.call(main.querySelectorAll('[data-c]'), function (cb) {
+      cb.onchange = function () { S.checks[i + '-' + cb.dataset.c] = cb.checked; save(); drawState(); drawNav(); };
+    });
+    function drawState() { var s = $('[data-state]', main), d = stepDone(i); s.textContent = d ? '✓ Completado' : 'Pendiente'; s.className = 'state' + (d ? ' ok' : ''); }
+    drawState();
+    var pb = $('[data-prev]', main), nb = $('[data-next]', main);
+    if (pb) pb.onclick = function () { open(i - 1); window.scrollTo(0, 0); };
+    if (nb) nb.onclick = function () { open(i + 1); window.scrollTo(0, 0); };
+  }
+
+  function open(i) {
+    cur = i; drawNav();
+    var st = STEPS[i];
+    if (st.kind === 'info') { openInfo(i, st); return; }
+    var ci = st.ci, hp = ci > 0 ? H[ci - 1] : null, jp = ci > 0 ? J[ci - 1] : null;
+    var codeHtml =
+      block('index.html · cuerpo (HTML)', H[ci], hp) +
+      block('index.html · JavaScript', J[ci], jp);
+    var gitTexts = { g: gitCmds(ci, st.git.msg) };
+    var gitCard = '<div class="card gitcard"><h3>Guarda este avance en GitHub</h3><p>' + st.git.nota + '</p>' +
+      cmdBlock('Terminal · dentro de la carpeta vet-turnos', gitTexts.g, 'g') +
+      '<p class="note">Recarga tu repositorio en GitHub: arriba de la lista de archivos debe aparecer tu commit <code>' + esc(st.git.msg) + '</code>.</p></div>';
+    var codeSection = st.solucion
+      ? '<details class="fold"><summary>Ver la solución del reto (inténtalo primero)</summary><div class="inner">' + codeHtml + '</div></details>'
+      : codeHtml;
+    var cssSection = '<details class="fold"' + (ci === 0 ? ' open' : '') + '><summary>Estilos (CSS)' + (ci === 0 ? '' : ' · no cambian') + '</summary>' + pre('index.html · estilos', CSS, null) + '</details>';
+    main.innerHTML =
+      '<article class="step">' +
+        '<div class="exhead"><span class="num">' + (ci === 0 ? 'Punto de partida' : 'Paso ' + ci + ' de 5') + '</span><span class="tag">' + st.tag + '</span><span class="state" data-state></span></div>' +
+        '<h2>' + st.titulo + '</h2>' +
+        '<div class="card"><h3>Qué vas a lograr</h3><p>' + st.logro + '</p></div>' +
+        '<div class="card concept"><p>' + st.concepto + '</p></div>' +
+        '<div class="card"><h3>Haz esto</h3><ol class="todo">' + st.pasos.map(function (p) { return '<li>' + p + '</li>'; }).join('') + '</ol>' + (st.nota ? '<p class="note">' + st.nota + '</p>' : '') + '</div>' +
+        '<div class="inner">' +
+          '<div class="codehead"><h3>Código de este paso</h3>' + (ci > 0 && !st.solucion ? '<span class="legend"><i></i> línea nueva o modificada</span>' : '') + '<button class="act primary" data-copy>Copiar archivo completo</button></div>' +
+          codeSection + cssSection +
+        '</div>' +
+        '<div class="inner"><h3>Pruébalo</h3><div class="preview">' +
+          '<div class="pv"><div class="bar2"><i></i><i></i><i></i> index.html en este paso</div><div class="host" data-host></div></div>' +
+          '<div class="inner"><div class="row" data-tests></div><div class="log" data-log></div></div>' +
+        '</div></div>' + gitCard +
+        '<div class="card"><h3>Punto de control</h3><ul class="checks">' + st.checks.map(function (c, k) {
+          return '<li><label><input type="checkbox" data-c="' + k + '"' + (S.checks[i + '-' + k] ? ' checked' : '') + '><span>' + c + '</span></label></li>';
+        }).join('') + '</ul></div>' +
+        '<details class="think"><summary>Para pensar: ' + st.pensar[0] + '</summary><p>' + st.pensar[1] + '</p></details>' +
+        '<div class="navbtns">' + (i > 0 ? '<button class="act" data-prev>← Paso anterior</button>' : '<span></span>') + (i < STEPS.length - 1 ? '<button class="act primary" data-next>Siguiente paso →</button>' : '<span></span>') + '</div>' +
+      '</article>';
+
+    var log = new Log($('[data-log]', main)), pv;
+    function reset() { log.clear(); pv = mount($('[data-host]', main), ci, log); }
+    reset();
+    var tests = $('[data-tests]', main);
+    st.pruebas.forEach(function (t) {
+      var b = document.createElement('button'); b.className = 'act mono'; b.textContent = t.label;
+      b.onclick = function () {
+        if (t.form) { try { runForm(pv, t.form, log); } catch (e) { log.add('err', t.label, e.name + ': ' + e.message); } }
+        else { try { var r = t.js(pv.ns); log.add('ok', t.src, '→ ' + show(r)); } catch (e) { log.add('err', t.src, e.name + ': ' + e.message); } }
+      };
+      tests.appendChild(b);
+    });
+    var rb = document.createElement('button'); rb.className = 'act'; rb.textContent = 'Reiniciar vista previa'; rb.onclick = reset; tests.appendChild(rb);
+
+    $('[data-copy]', main).onclick = function () { copyText(fullFile(ci), this); };
+    bindCmds(gitTexts);
+    Array.prototype.forEach.call(main.querySelectorAll('[data-c]'), function (cb) {
+      cb.onchange = function () { S.checks[i + '-' + cb.dataset.c] = cb.checked; save(); drawState(); drawNav(); };
+    });
+    function drawState() { var s = $('[data-state]', main), d = stepDone(i); s.textContent = d ? '✓ Completado' : 'Pendiente'; s.className = 'state' + (d ? ' ok' : ''); }
+    drawState();
+    var pb = $('[data-prev]', main), nb = $('[data-next]', main);
+    if (pb) pb.onclick = function () { open(i - 1); window.scrollTo(0, 0); };
+    if (nb) nb.onclick = function () { open(i + 1); window.scrollTo(0, 0); };
+  }
+
+  var start = 0;
+  for (var z = 0; z < STEPS.length; z++) { if (!stepDone(z)) { start = z; break; } }
+  open(start);
+})();
+</script>
+
+</body></html>
