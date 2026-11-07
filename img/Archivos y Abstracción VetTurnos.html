@@ -1,0 +1,821 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Archivos y Abstracción VetTurnos</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@600;700;800&family=Nunito+Sans:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: menú lateral con 4 secciones; a la derecha explicación, diagrama interactivo, código real del estudiante y punto de control. */
+:root {
+  --bg: #f4f7f1;
+  --surface: #ffffff;
+  --fg: #1b2418;
+  --muted: #536050;
+  --line: #d6dfcf;
+  --accent: #1e5f00;
+  --on-accent: #ffffff;
+  --accent-soft: #e6f3de;
+  --brand: #39a900;
+  --bad: #b3261e;
+  --bad-soft: #fbe9e7;
+  --code-bg: #14210f;
+  --code-fg: #e3eedb;
+  --code-dim: #8fa586;
+  --font-display: 'Bricolage Grotesque', 'Segoe UI', sans-serif;
+  --font-body: 'Nunito Sans', 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', Consolas, 'Courier New', monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0e150c; --surface: #162112; --fg: #e5eee0; --muted: #9db093;
+    --line: #2a3a25; --accent: #6fd62a; --on-accent: #0e150c; --accent-soft: #1d2d17;
+    --brand: #6fd62a; --bad: #ff9a90; --bad-soft: #3a1c19;
+    --code-bg: #0a1008; --code-fg: #dfead8; --code-dim: #7f9576;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0e150c; --surface: #162112; --fg: #e5eee0; --muted: #9db093;
+  --line: #2a3a25; --accent: #6fd62a; --on-accent: #0e150c; --accent-soft: #1d2d17;
+  --brand: #6fd62a; --bad: #ff9a90; --bad-soft: #3a1c19;
+  --code-bg: #0a1008; --code-fg: #dfead8; --code-dim: #7f9576;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-body); font-size: 15px; line-height: 1.6;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 26px 56px;
+}
+.wrap { max-width: 1160px; margin: 0 auto; display: grid; gap: 20px; }
+h1, h2, h3 { font-family: var(--font-display); text-wrap: balance; margin: 0; line-height: 1.15; }
+h1 { font-size: clamp(26px, 5vw, 38px); font-weight: 800; letter-spacing: -0.02em; }
+h2 { font-size: 26px; font-weight: 700; }
+h3 { font: 700 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+p { margin: 0; }
+code { font-family: var(--font-mono); font-size: .88em; background: var(--accent-soft); padding: 1px 6px; border-radius: 4px; }
+pre code { background: none; padding: 0; border-radius: 0; font-size: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--brand); outline-offset: 2px; }
+.kicker { font: 600 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin-bottom: 8px; }
+
+.top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(200px, 280px); gap: 20px; align-items: end; }
+@media (max-width: 720px) { .top { grid-template-columns: minmax(0, 1fr); } }
+.top p { color: var(--muted); max-width: 66ch; margin-top: 8px; }
+.progress { display: grid; gap: 6px; }
+.progress b { font: 700 13px var(--font-mono); }
+.bar { height: 10px; border-radius: 999px; background: var(--accent-soft); border: 1.5px solid var(--line); overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--brand); width: 0; transition: width .4s; }
+
+.layout { display: grid; grid-template-columns: 232px minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 900px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+nav#nav { display: grid; gap: 6px; position: sticky; top: env(safe-area-inset-top, 0px); }
+@media (max-width: 900px) { nav#nav { position: static; display: flex; overflow-x: auto; padding-bottom: 6px; } }
+.navitem {
+  display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: center; text-align: left;
+  font: 600 13.5px var(--font-body); color: var(--fg); background: var(--surface);
+  border: 1.5px solid var(--line); border-radius: 10px; padding: 8px 10px; cursor: pointer;
+}
+@media (max-width: 900px) { .navitem { flex: 0 0 auto; } .navitem .nt small { display: none; } }
+.navitem:hover { border-color: var(--accent); }
+.navitem[aria-current="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.navitem .n { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 700 12px var(--font-mono); background: var(--line); color: var(--fg); }
+.navitem.done .n { background: var(--accent); color: var(--on-accent); }
+.navitem .nt { min-width: 0; line-height: 1.25; display: grid; }
+.navitem .nt small { font: 600 10.5px var(--font-mono); letter-spacing: .04em; color: var(--muted); text-transform: uppercase; }
+
+.step { display: grid; gap: 18px; min-width: 0; }
+.exhead { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.exhead .num { font: 600 12px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); }
+.tag { font: 700 11px var(--font-mono); letter-spacing: .05em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; border: 1.5px solid var(--accent); color: var(--accent); }
+.state { margin-left: auto; font: 700 12px var(--font-mono); color: var(--muted); }
+.state.ok { color: var(--accent); }
+.card { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 16px 18px; display: grid; gap: 10px; min-width: 0; align-content: start; }
+.concept { border-color: var(--accent); background: var(--accent-soft); }
+.concept b { color: var(--accent); }
+ol.todo, ul.req { margin: 0; padding-left: 22px; display: grid; gap: 6px; }
+ol.todo li::marker, ul.req li::marker { font-weight: 700; color: var(--accent); }
+.note { color: var(--muted); font-size: 14px; }
+.cols3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 820px) { .cols3 { grid-template-columns: minmax(0, 1fr); } }
+.role { display: grid; gap: 6px; align-content: start; }
+.role .fn { font: 700 15px var(--font-mono); color: var(--accent); }
+.role .ro { font: 600 11px var(--font-mono); letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+
+.codewrap { background: var(--code-bg); border-radius: 10px; overflow: hidden; min-width: 0; }
+.codewrap .cap { font: 600 11px var(--font-mono); letter-spacing: .08em; text-transform: uppercase; color: var(--code-dim); padding: 9px 14px 0; }
+pre { margin: 0; padding: 8px 14px 14px; overflow-x: auto; color: var(--code-fg); font: 400 12.5px/1.65 var(--font-mono); }
+pre .l { display: block; padding: 0 14px; margin: 0 -14px; white-space: pre; }
+pre .l.hi { background: rgba(143, 224, 74, .16); box-shadow: inset 3px 0 0 #8fe04a; }
+pre .l.sel { cursor: pointer; }
+pre .l.sel:hover { background: rgba(143, 224, 74, .08); }
+pre .l.bad { background: rgba(255, 120, 100, .18); box-shadow: inset 3px 0 0 #ff7864; }
+pre .l.good { background: rgba(143, 224, 74, .16); box-shadow: inset 3px 0 0 #8fe04a; }
+details.fold { border: 1.5px dashed var(--line); border-radius: 10px; background: var(--surface); }
+details.fold > summary { cursor: pointer; padding: 9px 14px; font: 600 13px var(--font-mono); color: var(--muted); }
+details.fold > .inner { margin: 0 10px 10px; }
+.inner { display: grid; gap: 12px; min-width: 0; }
+.pair { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .pair { grid-template-columns: minmax(0, 1fr); } }
+
+button.act {
+  font: 700 13.5px var(--font-body); border-radius: 8px; border: 1.5px solid var(--line);
+  background: var(--surface); color: var(--fg); padding: 9px 14px; cursor: pointer; min-width: 0;
+}
+button.act:hover { border-color: var(--accent); background: var(--accent-soft); }
+button.act[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); }
+button.act.primary { background: var(--accent); color: var(--on-accent); border-color: var(--accent); }
+button.act.primary:hover { filter: brightness(1.12); background: var(--accent); }
+button.act.mono { font-family: var(--font-mono); font-size: 12.5px; text-align: left; }
+.row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* Diagramas */
+.diagram { background: var(--surface); border: 1.5px solid var(--line); border-radius: 12px; padding: 10px; overflow-x: auto; }
+.diagram svg { display: block; width: 100%; min-width: 580px; height: auto; }
+.nd rect { fill: var(--surface); stroke: var(--line); stroke-width: 2; transition: fill .25s, stroke .25s; }
+.nd.abs rect { stroke-dasharray: 7 5; }
+.nd.ghost { opacity: .45; }
+.nd.on { opacity: 1; }
+.nd.on rect { stroke: var(--accent); fill: var(--accent-soft); }
+.nd.bad rect { stroke: var(--bad); fill: var(--bad-soft); }
+.nd.bad { opacity: 1; }
+.nd .t { font: 700 15px var(--font-mono); fill: var(--fg); }
+.nd .s { font: 600 11px var(--font-body); fill: var(--muted); }
+.nd .m { font: 400 11.5px var(--font-mono); fill: var(--fg); }
+.nd .st { font: 600 10px var(--font-mono); letter-spacing: .06em; fill: var(--muted); text-transform: uppercase; }
+.nd line.sep { stroke: var(--line); stroke-width: 1.5; }
+.edge path.ln { fill: none; stroke: var(--line); stroke-width: 2.5; transition: stroke .25s; }
+.edge.dash path.ln { stroke-dasharray: 7 5; }
+.edge .lb { font: 600 11.5px var(--font-mono); fill: var(--muted); }
+.edge.on path.ln { stroke: var(--accent); stroke-width: 3.5; }
+.edge.on .lb { fill: var(--accent); }
+.edge.bad path.ln { stroke: var(--bad); stroke-width: 3.5; }
+.edge.bad .lb { fill: var(--bad); }
+.edge path.ln { marker-end: url(#arr); }
+.edge.on path.ln { marker-end: url(#arrOn); }
+.edge.bad path.ln { marker-end: url(#arrBad); }
+.edge.inh path.ln { marker-end: url(#tri); }
+.edge.inh.on path.ln { marker-end: url(#triOn); }
+.edge.inh.bad path.ln { marker-end: url(#triBad); }
+.mk-a { fill: var(--line); }
+.mk-on { fill: var(--accent); }
+.mk-bad { fill: var(--bad); }
+.mk-t { fill: var(--surface); stroke: var(--line); stroke-width: 2; }
+.mk-t-on { fill: var(--surface); stroke: var(--accent); stroke-width: 2; }
+.mk-t-bad { fill: var(--surface); stroke: var(--bad); stroke-width: 2; }
+
+.panel { background: var(--bg); border: 1.5px solid var(--line); border-radius: 10px; padding: 14px 16px; display: grid; gap: 10px; min-width: 0; }
+.panel h4 { margin: 0; font: 700 17px var(--font-display); }
+.stepper { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.stepper .cnt { font: 700 12px var(--font-mono); color: var(--muted); }
+
+.log { background: var(--bg); border: 1.5px dashed var(--line); border-radius: 10px; padding: 10px 12px; min-height: 90px; max-height: 260px; overflow: auto; font: 400 12.5px/1.55 var(--font-mono); display: grid; gap: 4px; align-content: start; }
+.log .empty { color: var(--muted); font-family: var(--font-body); font-size: 13.5px; }
+.log .ln { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 6px; overflow-wrap: anywhere; }
+.log .ln.ok .mk { color: var(--accent); }
+.log .ln.err, .log .ln.err .mk { color: var(--bad); }
+.log .src { color: var(--muted); }
+
+.demo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+@media (max-width: 760px) { .demo { grid-template-columns: minmax(0, 1fr); } }
+.demo .box { background: var(--bg); border: 1.5px solid var(--line); border-radius: 10px; padding: 12px; display: grid; gap: 8px; min-width: 0; }
+.demo ul { list-style: none; margin: 0; padding: 0; }
+.demo .paciente { background: var(--surface); border-left: 4px solid var(--accent); border-radius: 6px; padding: 10px 12px; font-size: 14px; }
+.demo .paciente small { color: var(--muted); display: block; margin-top: 2px; }
+.demo li small { display: block; }
+
+.find { display: grid; gap: 12px; }
+.find .head { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.sev { font: 700 11px var(--font-mono); letter-spacing: .05em; text-transform: uppercase; padding: 3px 10px; border-radius: 999px; border: 1.5px solid var(--bad); color: var(--bad); }
+.sev.low { border-color: var(--muted); color: var(--muted); }
+
+.checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.checks label { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; font-size: 14.5px; }
+.checks input { width: 18px; height: 18px; margin-top: 3px; accent-color: var(--accent); flex: 0 0 auto; }
+details.think { border: 1.5px solid var(--line); border-radius: 10px; background: var(--surface); padding: 12px 16px; }
+details.think summary { cursor: pointer; font-weight: 700; }
+details.think p { margin-top: 8px; color: var(--muted); }
+.navbtns { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+[data-step][hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="kicker">SENA · ADSO · Proyecto VetTurnos</div>
+      <h1>Cómo se conectan tus tres archivos y cómo funciona la abstracción</h1>
+      <p>Tu proyecto tiene <code>index.html</code>, <code>estilos.css</code> y <code>programa.js</code>. En esta guía ves, con diagramas que puedes tocar, qué hace cada archivo, cómo el navegador los une y por qué la clase <code>Mascota</code> no se puede crear directamente. Al final revisamos tu propio código y marcamos tres detalles por corregir.</p>
+    </div>
+    <div class="progress" aria-live="polite">
+      <b id="prog-txt">0 de 4 secciones</b>
+      <div class="bar"><i id="prog-bar"></i></div>
+    </div>
+  </div>
+  <div class="layout">
+    <nav id="nav" aria-label="Secciones"></nav>
+    <main id="main">
+
+      <!-- ===== 0. Los tres archivos ===== -->
+      <article class="step" data-step="0">
+        <div class="exhead"><span class="num">Sección 1 de 4</span><span class="tag">Panorama</span><span class="state" data-state></span></div>
+        <h2>Tres archivos, tres trabajos</h2>
+        <div class="card"><h3>Qué vas a lograr</h3><p>Reconocer qué responsabilidad tiene cada archivo de VetTurnos y por qué conviene separarlos en lugar de escribir todo en uno solo.</p></div>
+        <div class="card concept"><p><b>Estructura, aspecto y comportamiento.</b> El HTML dice <em>qué hay</em> en la página (formulario, lista, botón). El CSS dice <em>cómo se ve</em>. El JavaScript dice <em>qué pasa</em> cuando el usuario actúa. Los tres viven en la misma carpeta y el navegador los junta al abrir <code>index.html</code>.</p></div>
+        <div class="cols3">
+          <div class="card role"><span class="ro">Estructura</span><span class="fn">index.html</span><p>Define el formulario con sus campos (<code>tipo</code>, <code>nombre</code>, <code>peso</code>), el botón, el mensaje y la lista vacía. Es el único archivo que abres con doble clic.</p></div>
+          <div class="card role"><span class="ro">Aspecto</span><span class="fn">estilos.css</span><p>Define los colores verdes, el ancho de la página, el aspecto de las tarjetas de pacientes y los mensajes en verde o rojo.</p></div>
+          <div class="card role"><span class="ro">Comportamiento</span><span class="fn">programa.js</span><p>Contiene las clases <code>Mascota</code>, <code>Perro</code> y <code>Gato</code>, escucha el envío del formulario y dibuja cada paciente en la lista.</p></div>
+        </div>
+        <div class="inner">
+          <h3>Tu código real</h3>
+          <details class="fold"><summary>index.html</summary><div class="inner" data-code="html"></div></details>
+          <details class="fold"><summary>estilos.css</summary><div class="inner" data-code="css"></div></details>
+          <details class="fold"><summary>programa.js</summary><div class="inner" data-code="js"></div></details>
+        </div>
+        <div class="card"><h3>Punto de control</h3><ul class="checks" data-checks></ul></div>
+        <details class="think"><summary>Para pensar: ¿por qué no escribir todo dentro de index.html?</summary><p>Se puede, y la guía anterior lo hizo para empezar con un solo archivo. Pero cuando el proyecto crece, separar permite cambiar los colores sin tocar la lógica, reutilizar el mismo CSS en otras páginas y encontrar un error mirando solo el archivo que corresponde.</p></details>
+        <div class="navbtns"><span></span><button class="act primary" data-next>Siguiente sección →</button></div>
+      </article>
+
+      <!-- ===== 1. Cómo se conectan ===== -->
+      <article class="step" data-step="1" hidden>
+        <div class="exhead"><span class="num">Sección 2 de 4</span><span class="tag">Conexión</span><span class="state" data-state></span></div>
+        <h2>Cómo se conectan los tres archivos</h2>
+        <div class="card"><h3>Qué vas a lograr</h3><p>Ver las cuatro conexiones que existen entre los archivos y el orden en que el navegador los lee. Toca un botón y el diagrama resalta la flecha con el código que la hace posible.</p></div>
+        <div class="card concept"><p><b>Solo <code>index.html</code> conoce a los otros dos.</b> Dentro de él, <code>&lt;link&gt;</code> trae el CSS y <code>&lt;script&gt;</code> trae el JavaScript. Después los otros dos archivos se refieren al HTML: el CSS mediante <em>selectores</em> y el JavaScript mediante <em>ids</em>.</p></div>
+
+        <div class="inner">
+          <h3>Diagrama de conexiones</h3>
+          <div class="row" data-cnbtns>
+            <button class="act" data-cn="link" aria-pressed="true">1 · &lt;link&gt; trae el CSS</button>
+            <button class="act" data-cn="script" aria-pressed="false">2 · &lt;script&gt; trae el JS</button>
+            <button class="act" data-cn="ids" aria-pressed="false">3 · El JS busca por id</button>
+            <button class="act" data-cn="sel" aria-pressed="false">4 · El CSS elige por selector</button>
+          </div>
+          <div class="diagram">
+            <svg id="svg1" viewBox="0 0 720 380" role="img" aria-label="Diagrama: index.html enlaza estilos.css y programa.js; ambos se refieren de vuelta a elementos del HTML">
+              <defs>
+                <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path class="mk-a" d="M0 0 L10 5 L0 10 z"/></marker>
+                <marker id="arrOn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path class="mk-on" d="M0 0 L10 5 L0 10 z"/></marker>
+                <marker id="arrBad" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path class="mk-bad" d="M0 0 L10 5 L0 10 z"/></marker>
+              </defs>
+              <g class="edge" data-id="link"><path class="ln" d="M270 104 L132 266"/><text class="lb" x="205" y="160" text-anchor="end">&lt;link href&gt;</text></g>
+              <g class="edge dash" data-id="sel"><path class="ln" d="M215 268 L322 106"/><text class="lb" x="278" y="214" text-anchor="start">selectores</text></g>
+              <g class="edge" data-id="script"><path class="ln" d="M450 104 L588 266"/><text class="lb" x="556" y="200" text-anchor="start">&lt;script src&gt;</text></g>
+              <g class="edge dash" data-id="ids"><path class="ln" d="M530 268 L420 106"/><text class="lb" x="496" y="236" text-anchor="end">getElementById</text></g>
+              <g class="nd" data-id="html"><rect x="250" y="20" width="220" height="84" rx="10"/><text class="t" x="360" y="56" text-anchor="middle">index.html</text><text class="s" x="360" y="78" text-anchor="middle">estructura · lo que hay</text></g>
+              <g class="nd" data-id="css"><rect x="20" y="270" width="220" height="84" rx="10"/><text class="t" x="130" y="306" text-anchor="middle">estilos.css</text><text class="s" x="130" y="328" text-anchor="middle">aspecto · cómo se ve</text></g>
+              <g class="nd" data-id="js"><rect x="480" y="270" width="220" height="84" rx="10"/><text class="t" x="590" y="306" text-anchor="middle">programa.js</text><text class="s" x="590" y="328" text-anchor="middle">comportamiento · qué pasa</text></g>
+            </svg>
+          </div>
+          <div class="panel" aria-live="polite">
+            <h4 id="cn-title"></h4>
+            <p id="cn-text"></p>
+            <div class="pair"><div id="cn-a"></div><div id="cn-b"></div></div>
+          </div>
+        </div>
+
+        <div class="inner">
+          <h3>Orden de carga en el navegador</h3>
+          <div class="stepper">
+            <button class="act" data-ord="prev">← Anterior</button>
+            <button class="act primary" data-ord="next">Siguiente →</button>
+            <button class="act" data-ord="reset">Reiniciar</button>
+            <span class="cnt" id="ord-cnt"></span>
+          </div>
+          <div class="panel" aria-live="polite"><h4 id="ord-title"></h4><p id="ord-text"></p></div>
+          <p class="note">Por eso la etiqueta <code>&lt;script&gt;</code> va al final del <code>&lt;body&gt;</code>: cuando <code>programa.js</code> se ejecuta, el formulario y la lista ya existen y <code>getElementById</code> los encuentra.</p>
+        </div>
+
+        <div class="card"><h3>Punto de control</h3><ul class="checks" data-checks></ul></div>
+        <details class="think"><summary>Para pensar: ¿qué pasaría si pones el &lt;script&gt; antes del &lt;form&gt;?</summary><p><code>document.getElementById("formulario")</code> devolvería <code>null</code> porque el formulario todavía no existe, y la línea siguiente lanzaría un error. Hay dos soluciones: dejar el script al final del body, o agregar el atributo <code>defer</code> al script.</p></details>
+        <div class="navbtns"><button class="act" data-prev>← Sección anterior</button><button class="act primary" data-next>Siguiente sección →</button></div>
+      </article>
+
+      <!-- ===== 2. Abstracción ===== -->
+      <article class="step" data-step="2" hidden>
+        <div class="exhead"><span class="num">Sección 3 de 4</span><span class="tag">Abstracción</span><span class="state" data-state></span></div>
+        <h2>La abstracción en Mascota</h2>
+        <div class="card"><h3>Qué vas a lograr</h3><p>Entender por qué <code>Mascota</code> no se puede crear con <code>new</code>, qué es el contrato <code>hacerSonido()</code> y cómo Perro y Gato lo cumplen. Todas las pruebas de esta sección ejecutan clases reales, escritas igual que en tu <code>programa.js</code>.</p></div>
+        <div class="card concept"><p><b>Abstracción: quedarse con lo esencial.</b> En la veterinaria nadie atiende a una «mascota a secas»: llega un perro o un gato. <code>Mascota</code> reúne lo que todas comparten (nombre, peso) y fija un <em>contrato</em>: toda mascota debe saber hacer un sonido, y cada especie decide cuál.</p></div>
+
+        <div class="inner">
+          <h3>Anatomía de la clase</h3>
+          <p class="note">Toca un botón o una línea del código para ver qué hace esa parte.</p>
+          <div class="row" data-anbtns></div>
+          <div class="codewrap"><div class="cap">programa.js · clases</div><pre><code id="an-code"></code></pre></div>
+          <div class="panel" aria-live="polite"><h4 id="an-title"></h4><p id="an-text"></p></div>
+        </div>
+
+        <div class="inner">
+          <h3>Diagrama de clases</h3>
+          <div class="row" data-tests></div>
+          <div class="diagram">
+            <svg id="svg2" viewBox="0 0 720 340" role="img" aria-label="Diagrama de clases: Perro, Gato y Pez heredan de la clase abstracta Mascota">
+              <defs>
+                <marker id="tri" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path class="mk-t" d="M1 1 L11 6 L1 11 z"/></marker>
+                <marker id="triOn" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path class="mk-t-on" d="M1 1 L11 6 L1 11 z"/></marker>
+                <marker id="triBad" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto"><path class="mk-t-bad" d="M1 1 L11 6 L1 11 z"/></marker>
+              </defs>
+              <g class="edge inh" data-id="e-p"><path class="ln" d="M120 220 L290 146"/><text class="lb" x="176" y="172" text-anchor="end">extends</text></g>
+              <g class="edge inh" data-id="e-g"><path class="ln" d="M360 220 L360 146"/><text class="lb" x="370" y="190" text-anchor="start">extends</text></g>
+              <g class="edge inh" data-id="e-z"><path class="ln" d="M600 220 L430 146"/><text class="lb" x="544" y="172" text-anchor="start">extends</text></g>
+              <g class="nd abs" data-id="m"><rect x="210" y="14" width="300" height="130" rx="10"/><text class="st" x="360" y="34" text-anchor="middle">«abstracta»</text><text class="t" x="360" y="56" text-anchor="middle">Mascota</text><line class="sep" x1="226" y1="68" x2="494" y2="68"/><text class="m" x="226" y="90">nombre, peso</text><line class="sep" x1="226" y1="100" x2="494" y2="100"/><text class="m" x="226" y="122">hacerSonido()  ← contrato</text></g>
+              <g class="nd" data-id="p"><rect x="20" y="220" width="200" height="96" rx="10"/><text class="t" x="120" y="248" text-anchor="middle">Perro</text><line class="sep" x1="36" y1="260" x2="204" y2="260"/><text class="m" x="36" y="284">hacerSonido()</text><text class="s" x="36" y="304">devuelve «Guau Guau»</text></g>
+              <g class="nd" data-id="g"><rect x="260" y="220" width="200" height="96" rx="10"/><text class="t" x="360" y="248" text-anchor="middle">Gato</text><line class="sep" x1="276" y1="260" x2="444" y2="260"/><text class="m" x="276" y="284">hacerSonido()</text><text class="s" x="276" y="304">devuelve «Miau Miau»</text></g>
+              <g class="nd ghost" data-id="z"><rect x="500" y="220" width="200" height="96" rx="10" stroke-dasharray="3 4"/><text class="t" x="600" y="248" text-anchor="middle">Pez</text><line class="sep" x1="516" y1="260" x2="684" y2="260"/><text class="m" x="516" y="284">(sin hacerSonido)</text><text class="s" x="516" y="304">clase de prueba</text></g>
+            </svg>
+          </div>
+          <div class="log" data-log></div>
+        </div>
+
+        <div class="card"><h3>Punto de control</h3><ul class="checks" data-checks></ul></div>
+        <details class="think"><summary>Para pensar: ¿qué ventaja tiene que Mascota lance un error en vez de dejar hacerSonido() vacío?</summary><p>Un método vacío falla en silencio: la mascota «no suena» y nadie sabe por qué. El error obliga a quien crea una clase nueva, como <code>Pez</code>, a completar el contrato, y el mensaje dice exactamente qué falta.</p></details>
+        <div class="navbtns"><button class="act" data-prev>← Sección anterior</button><button class="act primary" data-next>Siguiente sección →</button></div>
+      </article>
+
+      <!-- ===== 3. Revisa tu código ===== -->
+      <article class="step" data-step="3" hidden>
+        <div class="exhead"><span class="num">Sección 4 de 4</span><span class="tag">Revisión</span><span class="state" data-state></span></div>
+        <h2>Revisa tu código</h2>
+        <div class="card"><h3>Qué vas a lograr</h3><p>Encontrar y corregir tres detalles de tus archivos. Ninguno impide que la página abra, pero dos afectan lo que el usuario ve y el tercero esconde un mensaje de error roto.</p></div>
+        <div class="card concept"><p><b>Un error silencioso es el más difícil de ver.</b> JavaScript y CSS no avisan cuando un nombre no coincide: simplemente no aplican el estilo o devuelven <code>undefined</code>. Revisar las conexiones entre archivos es parte de programar.</p></div>
+
+        <div class="card find">
+          <div class="head"><h3>Hallazgo 1</h3><span class="sev">Afecta lo que se ve</span></div>
+          <h2 style="font-size:20px">La clase «Paciente» no coincide con «.paciente»</h2>
+          <p>En <code>programa.js</code> escribes <code>li.className = "Paciente"</code> con P mayúscula, pero en <code>estilos.css</code> el selector es <code>.paciente</code> en minúscula. CSS distingue mayúsculas, así que las tarjetas de la lista no reciben ningún estilo. Compara las dos con el mismo CSS:</p>
+          <div class="demo">
+            <div class="box"><h3>className = "Paciente"</h3><ul><li class="Paciente">Perro: Rocky - 18 Kg.<small>Guau Guau</small></li></ul></div>
+            <div class="box"><h3>className = "paciente"</h3><ul><li class="paciente">Perro: Rocky - 18 Kg.<small>Guau Guau</small></li></ul></div>
+          </div>
+          <div class="pair" data-fix="f1"></div>
+        </div>
+
+        <div class="card find">
+          <div class="head"><h3>Hallazgo 2</h3><span class="sev">Mensaje roto</span></div>
+          <h2 style="font-size:20px">this.constructor.nombre devuelve undefined</h2>
+          <p>Dentro del contrato usas <code>this.constructor.nombre</code>. El constructor de una clase es la propia clase, y las clases guardan su nombre en la propiedad <code>name</code>, no en <code>nombre</code>. Si una clase nueva olvida <code>hacerSonido()</code>, el mensaje dice «undefined debe implementar…». Pruébalo:</p>
+          <div class="row"><button class="act mono" data-f2="mal">Con .nombre (tu código)</button><button class="act mono" data-f2="bien">Con .name (corregido)</button></div>
+          <div class="log" data-f2log></div>
+          <div class="pair" data-fix="f2"></div>
+        </div>
+
+        <div class="card find">
+          <div class="head"><h3>Hallazgo 3</h3><span class="sev low">Detalle</span></div>
+          <h2 style="font-size:20px">El idioma de la página es «sp»</h2>
+          <p>En <code>index.html</code> tienes <code>&lt;html lang="sp"&gt;</code>. El código de idioma para español es <code>es</code>; «sp» no existe como código válido. El navegador y los lectores de pantalla usan este atributo para pronunciar y traducir bien el contenido.</p>
+          <div class="pair" data-fix="f3"></div>
+        </div>
+
+        <div class="card"><h3>Para el siguiente nivel</h3><p class="note">Hoy el peso acepta valores como -5, y en <code>estilos.css</code> existe la regla <code>#total</code> sin un elemento con ese id en el HTML. Ambas cosas se resuelven en los pasos de encapsulamiento y polimorfismo de la guía VetTurnos.</p></div>
+
+        <div class="card"><h3>Punto de control</h3><ul class="checks" data-checks></ul></div>
+        <details class="think"><summary>Para pensar: ¿cómo detectarías el hallazgo 1 sin que nadie te lo diga?</summary><p>Abre las herramientas del navegador (F12), pestaña Elementos, y selecciona una tarjeta de la lista. En el panel de estilos verás que ninguna regla de <code>.paciente</code> se aplica, y al comparar los nombres notas la diferencia de mayúsculas.</p></details>
+        <div class="navbtns"><button class="act" data-prev>← Sección anterior</button><span></span></div>
+      </article>
+
+    </main>
+  </div>
+</div>
+
+<script type="text/plain" data-k="css">
+:root{
+  --verde: #1e5f00;
+  --claro: #e6f3de;
+  --linea: #d6dfcf;
+  --rojo: #b3261e;
+}
+
+body{
+    font-family: system-ui, sans-serif;
+    background:#f4f7f1;
+    color:#1b2418;
+    margin:0;
+    padding: 20px;
+}
+
+main {max-width: 560px; margin: 0 auto;}
+
+form{
+    background: #fff;
+    border: 1px solid var(--linea);
+    border-radius: 10px;
+    padding: 14px;
+    display: grid;
+    gap:10px;
+
+}
+
+label { display: grid; gap: 4px; font-size: 13px; font-weight: 600; }
+input, select { padding: 8px; border: 1px solid var(--linea); border-radius: 6px; font-size: 14px; }
+button { background: var(--verde); color: #fff; border: 0; padding: 10px; border-radius: 6px; font-weight: 700; cursor: pointer; }
+
+#mensaje { min-height: 20px; font-size: 13px; font-weight: 600; }
+#mensaje.error { color: var(--rojo); }
+#mensaje.ok { color: var(--verde); }
+
+#lista { list-style: none; padding: 0; display: grid; gap: 8px; margin: 14px 0 0; }
+.paciente { background: #fff; border-left: 4px solid var(--verde); border-radius: 6px; padding: 10px 12px; font-size: 14px; }
+.paciente small { color: #536050; display: block; margin-top: 2px; }
+#total { font-weight: 700; margin-top: 12px; }
+</script>
+<script type="text/plain" data-k="js">
+//Abstracción de la lógica para registrar mascotas
+class Mascota {
+  constructor(nombre, peso) {
+    if (new.target === Mascota) {
+      throw new TypeError(
+        "No se puede instanciar la clase Mascota directamente",
+      );
+    }
+    this.nombre = nombre;
+    this.peso = peso;
+  }
+  //Contrato
+  hacerSonido(){
+    throw new Error(`${this.constructor.nombre} debe implementar el método de Hacer Sonido`);
+  }
+}
+
+//Sección para definir clases específicas de mascotas que heredan de Mascota
+class Perro extends Mascota{
+    hacerSonido(){
+        return "Guau Guau";
+    }
+}
+
+class Gato extends Mascota{
+    hacerSonido(){
+        return "Miau Miau";
+    }
+}
+
+//Conexión con la página de Index.
+const pacientes = [];
+const lista = document.getElementById("lista");
+const mensaje = document.getElementById("mensaje");
+
+function mostrar(tipo, texto){
+    mensaje.className = tipo;
+    mensaje.textContent = texto;
+}
+
+function dibujar(){
+    lista.innerHTML= "";
+    for(const m of pacientes){
+        const li = document.createElement("li");
+        li.className = "Paciente";
+        li.textContent = `${m.constructor.name}: ${m.nombre} - ${m.peso} Kg.`;
+        const detalle = document.createElement("small");
+        detalle.textContent = m.hacerSonido();
+        li.appendChild(detalle);
+        lista.appendChild(li);
+    }
+}
+
+//Aquí se consolida la lógica del ejercicio para registrar mascotas
+document.getElementById("formulario").addEventListener("submit", (e) => {
+  e.preventDefault(); //evita que la página se recargue al enviar el formulario
+  const tipo = document.getElementById("tipo").value;
+  const nombre = document.getElementById("nombre").value;
+  const peso = Number(document.getElementById("peso").value);
+
+  const mascota = tipo === "perro" ? new Perro(nombre, peso) : new Gato(nombre, peso);
+
+  pacientes.push(mascota);
+
+  dibujar();
+
+  mostrar("ok", `Mascota ${nombre} registrada correctamente`);
+});
+</script>
+<script type="text/plain" data-k="html">
+<!DOCTYPE html>
+<html lang="sp">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vet Turnos</title>
+    <link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+    <main>
+        <h1>Bienvenido a Vet Turnos</h1>
+
+        <form id="formulario">
+            <label>Tipo de Mascota
+                <select id="tipo">
+                    <option value="perro">Perro</option>
+                    <option value="gato">Gato</option>
+                </select>
+            </label>
+            <label>Nombre de la Mascota
+                <input type="text" id="nombre" required placeholder="Ingrese el nombre de la mascota">
+            </label>
+             <label>Peso (Kg) de la Mascota
+                <input type="number" id="peso" required placeholder="Ingrese el peso de la mascota" step="0.01">
+            </label>
+            <button type="submit">Registrar</button>
+            <div id="mensaje"></div>
+        </form>
+
+        <ul id="lista"></ul>
+
+    </main>
+    <script src="programa.js">@@END@@
+</body>
+</html>
+</script>
+
+<script>
+(function () {
+  var $ = function (s, r) { return (r || document).querySelector(s); };
+  var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+  var esc = function (t) { return String(t).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var txt = function (k) { var el = $('script[data-k="' + k + '"]'); return el ? el.textContent.replace(/^\n/, '').replace(/\s+$/, '') : ''; };
+  var SRC = { css: txt('css'), js: txt('js'), html: txt('html').replace('@@END@@', '</scr' + 'ipt>') };
+
+  function lines(text, cls) {
+    return text.split('\n').map(function (t) { return '<span class="l' + (cls ? ' ' + cls : '') + '">' + (esc(t) || ' ') + '</span>'; }).join('');
+  }
+  function codeBlock(cap, text, cls) {
+    return '<div class="codewrap"><div class="cap">' + esc(cap) + '</div><pre><code>' + lines(text, cls) + '</code></pre></div>';
+  }
+  function copyText(text, btn) {
+    var old = btn.dataset.l || btn.textContent; btn.dataset.l = old;
+    var done = function (ok) { btn.textContent = ok ? '¡Copiado!' : 'Selecciona y copia manualmente'; setTimeout(function () { btn.textContent = old; }, 1800); };
+    var fb = function () {
+      var ta = document.createElement('textarea'); ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.appendChild(ta); ta.select(); var ok = false;
+      try { ok = document.execCommand('copy'); } catch (e) {}
+      document.body.removeChild(ta); done(ok);
+    };
+    try { navigator.clipboard.writeText(text).then(function () { done(true); }, fb); } catch (e) { fb(); }
+  }
+
+  /* ---------- código real en la sección 1 ---------- */
+  $$('[data-code]').forEach(function (el) {
+    var k = el.dataset.code, name = { html: 'index.html', css: 'estilos.css', js: 'programa.js' }[k];
+    el.innerHTML = codeBlock(name, SRC[k]);
+  });
+
+  /* ---------- svg helpers ---------- */
+  function setView(svg, spec) {
+    var bad = spec.bad || [];
+    $$('.nd', svg).forEach(function (n) {
+      var id = n.dataset.id;
+      n.classList.toggle('on', spec.nodes.indexOf(id) > -1);
+      n.classList.toggle('bad', bad.indexOf(id) > -1);
+    });
+    $$('.edge', svg).forEach(function (e) {
+      var id = e.dataset.id;
+      e.classList.toggle('on', spec.edges.indexOf(id) > -1);
+      e.classList.toggle('bad', bad.indexOf(id) > -1);
+    });
+  }
+
+  /* ---------- sección 2: conexiones ---------- */
+  var svg1 = $('#svg1');
+  var CN = {
+    link: {
+      nodes: ['html', 'css'], title: '1 · index.html trae el CSS con <link>',
+      text: 'La etiqueta <link> está en el <head>. Su atributo href es una ruta relativa: «estilos.css» significa «en la misma carpeta que este archivo». Si cambias el nombre del archivo o lo mueves, la página se ve sin estilos.',
+      a: ['index.html', '<link rel="stylesheet" href="estilos.css">'],
+      b: ['estilos.css', 'main {max-width: 560px; margin: 0 auto;}']
+    },
+    script: {
+      nodes: ['html', 'js'], title: '2 · index.html trae el JavaScript con <script>',
+      text: 'La etiqueta <script src> va al final del <body>. El navegador descarga programa.js y lo ejecuta de arriba hacia abajo en ese momento. Aquí se crean las clases y se registra el evento del formulario.',
+      a: ['index.html', '<script src="programa.js"></scr' + 'ipt>'],
+      b: ['programa.js', 'class Perro extends Mascota{\n    hacerSonido(){\n        return "Guau Guau";\n    }\n}']
+    },
+    ids: {
+      nodes: ['js', 'html'], title: '3 · programa.js busca elementos del HTML por su id',
+      text: 'El JavaScript no ve el HTML directamente: lo consulta con document.getElementById. El texto entre comillas debe ser idéntico al atributo id del elemento, incluidas las mayúsculas.',
+      a: ['index.html', '<form id="formulario">\n<ul id="lista"></ul>\n<div id="mensaje"></div>'],
+      b: ['programa.js', 'const lista = document.getElementById("lista");\nconst mensaje = document.getElementById("mensaje");\ndocument.getElementById("formulario")\n  .addEventListener("submit", (e) => { ... });']
+    },
+    sel: {
+      nodes: ['css', 'html'], title: '4 · estilos.css elige elementos con selectores',
+      text: 'El CSS tampoco se enlaza con nada: describe a quién aplicar el estilo. #mensaje busca el id, .paciente busca la clase. Cuando el JavaScript crea un <li> con className, el CSS lo reconoce solo si el nombre coincide.',
+      a: ['estilos.css', '#mensaje.error { color: var(--rojo); }\n#mensaje.ok { color: var(--verde); }\n.paciente { background: #fff; }'],
+      b: ['programa.js', 'mensaje.className = tipo;\nli.className = "Paciente";']
+    }
+  };
+  var EDGE = { link: 'link', script: 'script', ids: 'ids', sel: 'sel' };
+  function showCn(k) {
+    var c = CN[k];
+    setView(svg1, { nodes: c.nodes, edges: [EDGE[k]] });
+    $('#cn-title').textContent = c.title;
+    $('#cn-text').textContent = c.text;
+    $('#cn-a').innerHTML = codeBlock(c.a[0], c.a[1]);
+    $('#cn-b').innerHTML = codeBlock(c.b[0], c.b[1]);
+    $$('[data-cn]').forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.cn === k ? 'true' : 'false'); });
+  }
+  $$('[data-cn]').forEach(function (b) { b.onclick = function () { showCn(b.dataset.cn); }; });
+  showCn('link');
+
+  var ORD = [
+    { nodes: ['html'], edges: [], t: 'El navegador abre index.html', x: 'Empieza a leer el archivo de arriba hacia abajo. Todavía no sabe que existen el CSS ni el JavaScript.' },
+    { nodes: ['html', 'css'], edges: ['link'], t: 'Encuentra <link> y descarga estilos.css', x: 'En el <head> aparece la etiqueta <link>. El navegador pide estilos.css y guarda las reglas para aplicarlas a los elementos que vaya dibujando.' },
+    { nodes: ['html', 'css'], edges: ['sel'], t: 'Dibuja el formulario y la lista con estilo', x: 'Lee el <body>, crea el formulario, el botón, el mensaje y la lista vacía, y les aplica las reglas del CSS por selector.' },
+    { nodes: ['html', 'js'], edges: ['script'], t: 'Llega a <script> y ejecuta programa.js', x: 'Al final del body descarga programa.js y lo ejecuta. Se definen Mascota, Perro y Gato, y se busca cada elemento por su id.' },
+    { nodes: ['js', 'html'], edges: ['ids'], t: 'Espera el envío del formulario', x: 'Con el evento submit registrado, la página queda lista. Cada vez que el usuario pulsa Registrar, el JavaScript crea una mascota y dibuja un <li> nuevo.' }
+  ];
+  var oi = 0;
+  function showOrd() {
+    var o = ORD[oi];
+    setView(svg1, { nodes: o.nodes, edges: o.edges });
+    $$('[data-cn]').forEach(function (b) { b.setAttribute('aria-pressed', 'false'); });
+    $('#ord-title').textContent = o.t; $('#ord-text').textContent = o.x;
+    $('#ord-cnt').textContent = 'Paso ' + (oi + 1) + ' de ' + ORD.length;
+  }
+  $$('[data-ord]').forEach(function (b) {
+    b.onclick = function () {
+      var a = b.dataset.ord;
+      if (a === 'next') oi = Math.min(ORD.length - 1, oi + 1);
+      else if (a === 'prev') oi = Math.max(0, oi - 1);
+      else oi = 0;
+      showOrd();
+    };
+  });
+  $('#ord-title').textContent = 'Pulsa «Siguiente» para recorrer la carga paso a paso';
+  $('#ord-text').textContent = 'El diagrama de arriba resalta qué archivo interviene en cada momento.';
+  $('#ord-cnt').textContent = '';
+
+  /* ---------- sección 3: abstracción ---------- */
+  var ANAT = [
+    '//Abstracción de la lógica para registrar mascotas',
+    'class Mascota {',
+    '  constructor(nombre, peso) {',
+    '    if (new.target === Mascota) {',
+    '      throw new TypeError(',
+    '        "No se puede instanciar la clase Mascota directamente",',
+    '      );',
+    '    }',
+    '    this.nombre = nombre;',
+    '    this.peso = peso;',
+    '  }',
+    '  //Contrato',
+    '  hacerSonido(){',
+    '    throw new Error(`${this.constructor.name} debe implementar hacerSonido`);',
+    '  }',
+    '}',
+    '',
+    'class Perro extends Mascota{',
+    '    hacerSonido(){',
+    '        return "Guau Guau";',
+    '    }',
+    '}'
+  ];
+  var GR = [
+    { id: 'a', n: 'La clase general', rng: [1, 1], t: 'Mascota agrupa lo común', x: 'Declara la clase que reúne lo que comparten todas las mascotas. No representa a un animal real, sino la idea general que sirve de molde para las especies.' },
+    { id: 'b', n: 'El candado new.target', rng: [3, 7], t: 'Nadie crea una Mascota a secas', x: 'new.target indica con qué clase se llamó a new. Si es Mascota, se lanza un TypeError. Si se llamó desde Perro o Gato (mediante super), new.target es esa clase y el código continúa.' },
+    { id: 'c', n: 'Lo que comparten', rng: [8, 9], t: 'Atributos comunes', x: 'nombre y peso se guardan aquí una sola vez. Perro y Gato los reciben sin repetir el constructor porque lo heredan.' },
+    { id: 'd', n: 'El contrato', rng: [11, 14], t: 'hacerSonido() obliga a las hijas', x: 'Este método declara que toda mascota hace un sonido, pero no dice cuál. Si una clase hija no lo reemplaza, al llamarlo se lanza el error con el nombre de la clase que incumplió.' },
+    { id: 'e', n: 'Una hija que cumple', rng: [17, 21], t: 'Perro completa el contrato', x: 'extends hace que Perro herede de Mascota. Al definir su propio hacerSonido(), reemplaza el método general y devuelve su sonido. Gato hace lo mismo con «Miau Miau».' }
+  ];
+  var anCode = $('#an-code'), anBtns = $('[data-anbtns]');
+  function lineGroup(i) { for (var k = 0; k < GR.length; k++) if (i >= GR[k].rng[0] && i <= GR[k].rng[1]) return GR[k].id; return ''; }
+  anCode.innerHTML = ANAT.map(function (t, i) {
+    var g = lineGroup(i);
+    return '<span class="l' + (g ? ' sel' : '') + '" data-g="' + g + '">' + (esc(t) || ' ') + '</span>';
+  }).join('');
+  GR.forEach(function (g) {
+    var b = document.createElement('button'); b.className = 'act'; b.textContent = g.n; b.dataset.g = g.id; b.setAttribute('aria-pressed', 'false');
+    b.onclick = function () { showAn(g.id); }; anBtns.appendChild(b);
+  });
+  $$('.l.sel', anCode).forEach(function (l) { l.onclick = function () { showAn(l.dataset.g); }; });
+  function showAn(id) {
+    var g = GR.filter(function (x) { return x.id === id; })[0];
+    $$('.l', anCode).forEach(function (l) { l.classList.toggle('hi', l.dataset.g === id); });
+    $$('[data-g]', anBtns).forEach(function (b) { b.setAttribute('aria-pressed', b.dataset.g === id ? 'true' : 'false'); });
+    $('#an-title').textContent = g.t; $('#an-text').textContent = g.x;
+  }
+  showAn('b');
+
+  // Clases reales (con el contrato corregido a constructor.name)
+  class Mascota {
+    constructor(nombre, peso) {
+      if (new.target === Mascota) { throw new TypeError('No se puede instanciar la clase Mascota directamente'); }
+      this.nombre = nombre; this.peso = peso;
+    }
+    hacerSonido() { throw new Error(this.constructor.name + ' debe implementar el método hacerSonido'); }
+  }
+  class Perro extends Mascota { hacerSonido() { return 'Guau Guau'; } }
+  class Gato extends Mascota { hacerSonido() { return 'Miau Miau'; } }
+
+  var svg2 = $('#svg2'), log2 = $('[data-log]');
+  function Log(el, hint) { this.el = el; this.hint = hint; this.clear(); }
+  Log.prototype.clear = function () { this.el.innerHTML = '<div class="empty">' + this.hint + '</div>'; };
+  Log.prototype.add = function (kind, src, msg) {
+    if ($('.empty', this.el)) this.el.innerHTML = '';
+    var d = document.createElement('div'); d.className = 'ln ' + kind;
+    d.innerHTML = '<span class="mk">' + (kind === 'ok' ? '✓' : '✗') + '</span><span><span class="src">' + esc(src) + '</span><br>' + esc(msg) + '</span>';
+    this.el.appendChild(d); this.el.scrollTop = this.el.scrollHeight;
+  };
+  var lg = new Log(log2, 'Pulsa una de las pruebas de arriba y mira cómo responde el diagrama y qué devuelve el código.');
+
+  var TESTS = [
+    { src: 'new Mascota("X", 5)', bad: ['m'], edgesBad: [], run: function () { return new Mascota('X', 5); } },
+    { src: 'new Perro("Rocky", 18).hacerSonido()', view: { nodes: ['p', 'm'], edges: ['e-p'] }, run: function () { var p = new Perro('Rocky', 18); return 'Perro { nombre: "' + p.nombre + '", peso: ' + p.peso + ' } → "' + p.hacerSonido() + '"'; } },
+    { src: 'new Gato("Michi", 4).hacerSonido()', view: { nodes: ['g', 'm'], edges: ['e-g'] }, run: function () { var g = new Gato('Michi', 4); return 'Gato { nombre: "' + g.nombre + '", peso: ' + g.peso + ' } → "' + g.hacerSonido() + '"'; } },
+    { src: 'class Pez extends Mascota {}  →  new Pez("Nemo", 1).hacerSonido()', bad: ['z', 'e-z'], run: function () { class Pez extends Mascota {} return new Pez('Nemo', 1).hacerSonido(); } },
+    { src: 'for (const m of [Perro, Gato]) m.hacerSonido()', view: { nodes: ['p', 'g', 'm'], edges: ['e-p', 'e-g'] }, run: function () { return [new Perro('Rocky', 18), new Gato('Michi', 4)].map(function (m) { return m.constructor.name + ' → ' + m.hacerSonido(); }).join('  ·  ') + '   (sin if ni instanceof)'; } }
+  ];
+  var tbox = $('[data-tests]');
+  TESTS.forEach(function (t) {
+    var b = document.createElement('button'); b.className = 'act mono'; b.textContent = t.src;
+    b.onclick = function () {
+      try { var r = t.run(); lg.add('ok', t.src, '→ ' + r); setView(svg2, t.view || { nodes: [], edges: [] }); }
+      catch (e) { lg.add('err', t.src, e.name + ': ' + e.message); setView(svg2, { nodes: [], edges: [], bad: t.bad || [] }); }
+    };
+    tbox.appendChild(b);
+  });
+  var rb = document.createElement('button'); rb.className = 'act'; rb.textContent = 'Limpiar';
+  rb.onclick = function () { lg.clear(); setView(svg2, { nodes: [], edges: [] }); }; tbox.appendChild(rb);
+  setView(svg2, { nodes: [], edges: [] });
+
+  /* ---------- sección 4: hallazgos ---------- */
+  var FIX = {
+    f1: [
+      ['programa.js · antes', '        li.className = "Paciente";', 'bad'],
+      ['programa.js · después', '        li.className = "paciente";', 'good']
+    ],
+    f2: [
+      ['programa.js · antes', '    throw new Error(`${this.constructor.nombre} debe implementar el método de Hacer Sonido`);', 'bad'],
+      ['programa.js · después', '    throw new Error(`${this.constructor.name} debe implementar el método de Hacer Sonido`);', 'good']
+    ],
+    f3: [
+      ['index.html · antes', '<html lang="sp">', 'bad'],
+      ['index.html · después', '<html lang="es">', 'good']
+    ]
+  };
+  $$('[data-fix]').forEach(function (el) {
+    var f = FIX[el.dataset.fix];
+    el.innerHTML = f.map(function (x, i) { return '<div class="inner">' + codeBlock(x[0], x[1], x[2]) + (x[2] === 'good' ? '<div class="row"><button class="act" data-cp="' + el.dataset.fix + '">Copiar línea corregida</button></div>' : '') + '</div>'; }).join('');
+  });
+  $$('[data-cp]').forEach(function (b) { b.onclick = function () { copyText(FIX[b.dataset.cp][1][1].replace(/^\s+/, ''), b); }; });
+
+  var f2log = new Log($('[data-f2log]'), 'Pulsa un botón para ver qué mensaje recibe quien olvida hacerSonido().');
+  class Base { hacer(kind) { throw new Error((kind === 'mal' ? this.constructor.nombre : this.constructor.name) + ' debe implementar el método de Hacer Sonido'); } }
+  $$('[data-f2]').forEach(function (b) {
+    b.onclick = function () {
+      class Pez extends Base {}
+      var kind = b.dataset.f2;
+      try { new Pez().hacer(kind); } catch (e) { f2log.add(kind === 'mal' ? 'err' : 'ok', 'new Pez().hacerSonido()  usando ' + (kind === 'mal' ? '.nombre' : '.name'), e.message); }
+    };
+  });
+
+  /* ---------- navegación y puntos de control ---------- */
+  var CHECKS = [
+    ['Puedo decir qué hace cada archivo: estructura, aspecto y comportamiento', 'Sé abrir index.html y ver que carga el CSS y el JavaScript'],
+    ['Identifico las cuatro conexiones: link, script, getElementById y selectores', 'Entiendo por qué el script va al final del body'],
+    ['Explico por qué new Mascota() lanza un error', 'Entiendo qué es el contrato hacerSonido() y quién debe cumplirlo'],
+    ['Corregí «Paciente» por «paciente» y las tarjetas ya tienen estilo', 'Cambié constructor.nombre por constructor.name', 'Cambié lang="sp" por lang="es"']
+  ];
+  var KEY = 'guia-conexion-vetturnos-v1', S = { checks: {} }, cur = 0;
+  try { var raw = localStorage.getItem(KEY); if (raw) S.checks = JSON.parse(raw).checks || {}; } catch (e) {}
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) {} }
+  function done(i) { return CHECKS[i].every(function (c, k) { return S.checks[i + '-' + k]; }); }
+  var NAV = [['Panorama', 'Tres archivos'], ['Conexión', 'Cómo se unen'], ['Abstracción', 'Mascota y contrato'], ['Revisión', 'Tu código']];
+  var nav = $('#nav'), steps = $$('[data-step]');
+  function drawNav() {
+    nav.innerHTML = NAV.map(function (s, i) {
+      var d = done(i);
+      return '<button class="navitem' + (d ? ' done' : '') + '" data-i="' + i + '"' + (i === cur ? ' aria-current="true"' : '') + '><span class="n">' + (d ? '✓' : (i + 1)) + '</span><span class="nt">' + s[0] + '<small>' + s[1] + '</small></span></button>';
+    }).join('');
+    $$('.navitem', nav).forEach(function (b) { b.onclick = function () { go(Number(b.dataset.i)); }; });
+    var n = CHECKS.filter(function (c, i) { return done(i); }).length;
+    $('#prog-txt').textContent = n + ' de ' + CHECKS.length + ' secciones';
+    $('#prog-bar').style.width = (n / CHECKS.length * 100) + '%';
+  }
+  function drawState(i) {
+    var s = $('[data-state]', steps[i]), d = done(i);
+    s.textContent = d ? '✓ Completado' : 'Pendiente'; s.className = 'state' + (d ? ' ok' : '');
+  }
+  steps.forEach(function (st, i) {
+    var ul = $('[data-checks]', st);
+    ul.innerHTML = CHECKS[i].map(function (c, k) {
+      return '<li><label><input type="checkbox" data-c="' + k + '"' + (S.checks[i + '-' + k] ? ' checked' : '') + '><span>' + esc(c) + '</span></label></li>';
+    }).join('');
+    $$('[data-c]', ul).forEach(function (cb) {
+      cb.onchange = function () { S.checks[i + '-' + cb.dataset.c] = cb.checked; save(); drawState(i); drawNav(); };
+    });
+    var pb = $('[data-prev]', st), nb = $('[data-next]', st);
+    if (pb) pb.onclick = function () { go(i - 1); };
+    if (nb) nb.onclick = function () { go(i + 1); };
+    drawState(i);
+  });
+  function go(i) {
+    cur = i;
+    steps.forEach(function (st, k) { st.hidden = k !== i; });
+    drawNav(); window.scrollTo(0, 0);
+  }
+  go(0);
+})();
+</script>
+
+</body></html>
