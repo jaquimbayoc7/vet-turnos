@@ -1,4 +1,4 @@
-# vet-turnos
+# Vet Turnos
 
 Aplicación web inicial que aplica los pilares de la programación orientada a objetos (**abstracción, encapsulamiento, herencia y polimorfismo**) en JavaScript, usando como tema una veterinaria y sus mascotas. Se registran perros y gatos desde un formulario y se muestran en una lista con su sonido.
 
