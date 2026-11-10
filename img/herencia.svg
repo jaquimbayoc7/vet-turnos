@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 430" width="960" height="430"><style>
+text{fill:#1d2623;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:12.5px}
+.code{font-family:'IBM Plex Mono',Consolas,monospace;font-size:12px}
+.sm{font-size:11px}
+.title{font-weight:600;font-size:14px}
+.dim{fill:#5c6a65}.acc{fill:#0b7a6b}
+.box{fill:#fff;stroke:#1d2623;stroke-width:1.2}
+.abs{fill:#e0f1ee;stroke:#0b7a6b;stroke-width:2;stroke-dasharray:7 4}
+.rule{stroke:#c9d1cd;stroke-width:1}
+.inherit{stroke:#1d2623;stroke-width:1.3;fill:none}
+.head-inherit{fill:#f6f7f5;stroke:#1d2623;stroke-width:1.3}
+</style><rect width="100%" height="100%" fill="#f6f7f5"/>
+<defs>
+  <marker id="h-inherit" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto"><polygon class="head-inherit" points="1,1 11,6 1,11"/></marker>
+</defs>
+
+<text x="20" y="22" class="dim">CLASE PADRE</text>
+<text x="400" y="22" class="dim">SUBCLASES: CONSTRUCTOR Y describir() REUTILIZAN AL PADRE</text>
+
+<!-- parent -->
+<rect x="20" y="130" width="290" height="180" rx="3" class="abs"/>
+<text x="36" y="154" class="title">Mascota</text>
+<text x="108" y="154" class="dim">«abstracta»</text>
+<line x1="20" y1="166" x2="310" y2="166" class="rule"/>
+<text x="36" y="188" class="code sm">constructor(nombre, peso, especie)</text>
+<text x="36" y="206" class="dim">guarda nombre, #peso y especie</text>
+<line x1="20" y1="220" x2="310" y2="220" class="rule"/>
+<text x="36" y="242" class="code acc">describir()</text>
+<text x="36" y="260" class="dim">texto base con los tres datos</text>
+<text x="36" y="278" class="dim">que las subclases extienden</text>
+
+<!-- inheritance bus -->
+<line x1="360" y1="94" x2="360" y2="350" class="inherit"/>
+<line x1="400" y1="94" x2="360" y2="94" class="inherit"/>
+<line x1="400" y1="222" x2="360" y2="222" class="inherit"/>
+<line x1="400" y1="350" x2="360" y2="350" class="inherit"/>
+<line x1="360" y1="220" x2="312" y2="220" class="inherit" marker-end="url(#h-inherit)"/>
+<text x="318" y="210" class="dim">extends</text>
+
+<!-- Perro -->
+<rect x="400" y="40" width="540" height="108" rx="3" class="box"/>
+<text x="414" y="64" class="title">Perro</text>
+<text x="470" y="64" class="dim">campo propio: raza</text>
+<text x="414" y="86" class="code sm">constructor(nombre, peso, raza)  →  super(nombre, peso, "perro")</text>
+<text x="414" y="106" class="code sm">describir()  →  super.describir() + ", Raza: " + raza</text>
+<text x="414" y="130" class="dim">Nombre: Rex, Peso: 12 Kg, Especie: perro, Raza: Labrador</text>
+
+<!-- Gato -->
+<rect x="400" y="168" width="540" height="108" rx="3" class="box"/>
+<text x="414" y="192" class="title">Gato</text>
+<text x="470" y="192" class="dim">campo propio: deInterior (booleano)</text>
+<text x="414" y="214" class="code sm">constructor(nombre, peso, deInterior)  →  super(nombre, peso, "gato")</text>
+<text x="414" y="234" class="code sm">describir()  →  super.describir() + "De Interior" o "De Calle"</text>
+<text x="414" y="258" class="dim">Nombre: Misu, Peso: 4 Kg, Especie: gato De Interior</text>
+
+<!-- Ave -->
+<rect x="400" y="296" width="540" height="108" rx="3" class="box"/>
+<text x="414" y="320" class="title">Ave</text>
+<text x="460" y="320" class="dim">campo propio: puedeVolar (booleano)</text>
+<text x="414" y="342" class="code sm">constructor(nombre, peso, puedeVolar)  →  super(nombre, peso, "ave")</text>
+<text x="414" y="362" class="code sm">describir()  →  super.describir() + "Puede Volar" o "No Puede Volar"</text>
+<text x="414" y="386" class="dim">Nombre: Pío, Peso: 0.3 Kg, Especie: ave Puede Volar</text>
+</svg>

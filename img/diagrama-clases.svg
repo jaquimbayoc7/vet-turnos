@@ -1,78 +1,96 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 440" width="960" height="440"><style>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 520" width="960" height="520"><style>
 text{fill:#1d2623;font-family:'IBM Plex Sans',Arial,sans-serif;font-size:12.5px}
 .code{font-family:'IBM Plex Mono',Consolas,monospace;font-size:12px}
+.sm{font-size:11px}
 .title{font-weight:600;font-size:14px}
-.dim{fill:#5c6a65}.acc{fill:#0b7a6b}.bad{fill:#b3261e}.ital{font-style:italic}.big{font-size:18px;font-weight:600}
+.dim{fill:#5c6a65}.acc{fill:#0b7a6b}.ital{font-style:italic}
 .box{fill:#fff;stroke:#1d2623;stroke-width:1.2}
 .abs{fill:#e0f1ee;stroke:#0b7a6b;stroke-width:2;stroke-dasharray:7 4}
-.priv{fill:#e0f1ee;stroke:#b3261e;stroke-width:1.6}
 .rule{stroke:#c9d1cd;stroke-width:1}
 .flow{stroke:#5c6a65;stroke-width:1.3;fill:none}
-.make{stroke:#5c6a65;stroke-width:1.3;fill:none;stroke-dasharray:5 4}
-.contract{stroke:#0b7a6b;stroke-width:2.2;fill:none}
-.blocked{stroke:#b3261e;stroke-width:2;fill:none;stroke-dasharray:6 4}
 .inherit{stroke:#1d2623;stroke-width:1.3;fill:none}
-.head-flow{fill:#5c6a65}.head-contract{fill:#0b7a6b}
+.head-flow{fill:#5c6a65}
 .head-inherit{fill:#f6f7f5;stroke:#1d2623;stroke-width:1.3}
 </style><rect width="100%" height="100%" fill="#f6f7f5"/>
-        <defs>
-          <marker id="c-inherit" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto"><polygon class="head-inherit" points="1,1 11,6 1,11"/></marker>
-          <marker id="c-agg" viewBox="0 0 16 12" refX="1" refY="6" markerWidth="14" markerHeight="11" orient="auto"><polygon class="head-inherit" points="1,6 8,1 15,6 8,11"/></marker>
-          <marker id="c-flow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><polygon class="head-flow" points="0,0 10,5 0,10"/></marker>
-        </defs>
+<defs>
+  <marker id="c-inherit" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="11" markerHeight="11" orient="auto"><polygon class="head-inherit" points="1,1 11,6 1,11"/></marker>
+  <marker id="c-agg" viewBox="0 0 16 12" refX="1" refY="6" markerWidth="14" markerHeight="11" orient="auto"><polygon class="head-inherit" points="1,6 8,1 15,6 8,11"/></marker>
+  <marker id="c-flow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><polygon class="head-flow" points="0,0 10,5 0,10"/></marker>
+</defs>
 
-        <!-- Mascota (abstracta) -->
-        <rect x="330" y="30" width="300" height="206" rx="3" class="abs"/>
-        <text x="480" y="54" class="title ital" text-anchor="middle">Mascota</text>
-        <text x="480" y="70" class="dim" text-anchor="middle">«abstracta»</text>
-        <line x1="330" y1="80" x2="630" y2="80" class="rule"/>
-        <text x="346" y="100" class="code">+ nombre: string</text>
-        <text x="346" y="118" class="code">- #peso: number</text>
-        <line x1="330" y1="130" x2="630" y2="130" class="rule"/>
-        <text x="346" y="150" class="code">+ constructor(nombre, peso)</text>
-        <text x="346" y="168" class="code">+ get peso(): number</text>
-        <text x="346" y="186" class="code">+ set peso(valor: number): void</text>
-        <text x="346" y="204" class="code ital acc">+ hacerSonido(): string</text>
-        <text x="346" y="222" class="dim">constructor lanza TypeError si new.target === Mascota</text>
+<!-- Mascota (abstracta) -->
+<rect x="290" y="30" width="340" height="256" rx="3" class="abs"/>
+<text x="460" y="54" class="title ital" text-anchor="middle">Mascota</text>
+<text x="460" y="70" class="dim" text-anchor="middle">«abstracta»</text>
+<line x1="290" y1="80" x2="630" y2="80" class="rule"/>
+<text x="306" y="100" class="code">+ nombre: string</text>
+<text x="306" y="118" class="code">+ especie: string</text>
+<text x="306" y="136" class="code">- #peso: number</text>
+<line x1="290" y1="148" x2="630" y2="148" class="rule"/>
+<text x="306" y="168" class="code">+ constructor(nombre, peso, especie)</text>
+<text x="306" y="186" class="code">+ get peso(): number</text>
+<text x="306" y="204" class="code">+ set peso(valor: number): void</text>
+<text x="306" y="222" class="code ital acc">+ hacerSonido(): string</text>
+<text x="306" y="240" class="code">+ describir(): string</text>
+<line x1="290" y1="252" x2="630" y2="252" class="rule"/>
+<text x="306" y="272" class="dim">lanza Error si new.target === Mascota</text>
 
-        <!-- Perro -->
-        <rect x="190" y="320" width="240" height="84" rx="3" class="box"/>
-        <text x="310" y="344" class="title" text-anchor="middle">Perro</text>
-        <line x1="190" y1="354" x2="430" y2="354" class="rule"/>
-        <text x="204" y="376" class="code">+ hacerSonido(): string</text>
-        <text x="204" y="394" class="dim">devuelve "Guau Guau"</text>
+<!-- Perro -->
+<rect x="10" y="360" width="300" height="134" rx="3" class="box"/>
+<text x="160" y="384" class="title" text-anchor="middle">Perro</text>
+<line x1="10" y1="394" x2="310" y2="394" class="rule"/>
+<text x="24" y="414" class="code">+ raza: string</text>
+<line x1="10" y1="426" x2="310" y2="426" class="rule"/>
+<text x="24" y="446" class="code sm">+ constructor(nombre, peso, raza)</text>
+<text x="24" y="464" class="code">+ hacerSonido(): string</text>
+<text x="24" y="482" class="code">+ describir(): string</text>
 
-        <!-- Gato -->
-        <rect x="530" y="320" width="240" height="84" rx="3" class="box"/>
-        <text x="650" y="344" class="title" text-anchor="middle">Gato</text>
-        <line x1="530" y1="354" x2="770" y2="354" class="rule"/>
-        <text x="544" y="376" class="code">+ hacerSonido(): string</text>
-        <text x="544" y="394" class="dim">devuelve "Miau Miau"</text>
+<!-- Gato -->
+<rect x="330" y="360" width="300" height="134" rx="3" class="box"/>
+<text x="480" y="384" class="title" text-anchor="middle">Gato</text>
+<line x1="330" y1="394" x2="630" y2="394" class="rule"/>
+<text x="344" y="414" class="code">+ deInterior: boolean</text>
+<line x1="330" y1="426" x2="630" y2="426" class="rule"/>
+<text x="344" y="446" class="code sm">+ constructor(nombre, peso, deInterior)</text>
+<text x="344" y="464" class="code">+ hacerSonido(): string</text>
+<text x="344" y="482" class="code">+ describir(): string</text>
 
-        <!-- inheritance -->
-        <polyline points="310,320 310,282 480,282" class="inherit"/>
-        <polyline points="650,320 650,282 480,282" class="inherit"/>
-        <line x1="480" y1="282" x2="480" y2="238" class="inherit" marker-end="url(#c-inherit)"/>
-        <text x="492" y="268" class="dim">extends</text>
+<!-- Ave -->
+<rect x="650" y="360" width="300" height="134" rx="3" class="box"/>
+<text x="800" y="384" class="title" text-anchor="middle">Ave</text>
+<line x1="650" y1="394" x2="950" y2="394" class="rule"/>
+<text x="664" y="414" class="code">+ puedeVolar: boolean</text>
+<line x1="650" y1="426" x2="950" y2="426" class="rule"/>
+<text x="664" y="446" class="code sm">+ constructor(nombre, peso, puedeVolar)</text>
+<text x="664" y="464" class="code">+ hacerSonido(): string</text>
+<text x="664" y="482" class="code">+ describir(): string</text>
 
-        <!-- Clinica -->
-        <rect x="710" y="50" width="230" height="146" rx="3" class="box"/>
-        <text x="825" y="74" class="title" text-anchor="middle">Clinica</text>
-        <line x1="710" y1="84" x2="940" y2="84" class="rule"/>
-        <text x="724" y="104" class="code">- #pacientes: Mascota[]</text>
-        <line x1="710" y1="116" x2="940" y2="116" class="rule"/>
-        <text x="724" y="136" class="code">+ registrar(mascota): void</text>
-        <text x="724" y="154" class="code">+ get pacientes(): Mascota[]</text>
-        <text x="724" y="176" class="dim">registrar valida instanceof</text>
+<!-- inheritance -->
+<line x1="160" y1="360" x2="160" y2="322" class="inherit"/>
+<line x1="480" y1="360" x2="480" y2="322" class="inherit"/>
+<line x1="800" y1="360" x2="800" y2="322" class="inherit"/>
+<line x1="160" y1="322" x2="800" y2="322" class="inherit"/>
+<line x1="460" y1="322" x2="460" y2="288" class="inherit" marker-end="url(#c-inherit)"/>
+<text x="472" y="312" class="dim">extends</text>
 
-        <!-- aggregation Clinica o--> Mascota -->
-        <line x1="710" y1="120" x2="632" y2="120" class="flow" marker-start="url(#c-agg)" marker-end="url(#c-flow)"/>
-        <text x="646" y="110" class="code">0..*</text>
-        <text x="640" y="144" class="dim">pacientes</text>
+<!-- Clinica -->
+<rect x="710" y="50" width="240" height="146" rx="3" class="box"/>
+<text x="830" y="74" class="title" text-anchor="middle">Clinica</text>
+<line x1="710" y1="84" x2="950" y2="84" class="rule"/>
+<text x="724" y="104" class="code">- #pacientes: Mascota[]</text>
+<line x1="710" y1="116" x2="950" y2="116" class="rule"/>
+<text x="724" y="136" class="code">+ registrar(mascota): void</text>
+<text x="724" y="154" class="code">+ get pacientes(): Mascota[]</text>
+<text x="724" y="176" class="dim">registrar valida instanceof</text>
 
-        <!-- legend -->
-        <text x="20" y="30" class="dim">LEYENDA</text>
-        <text x="20" y="52" class="code">+</text><text x="40" y="52" class="dim">público</text>
-        <text x="20" y="72" class="code">-</text><text x="40" y="72" class="dim">privado (#)</text>
-        <text x="20" y="92" class="code ital">cursiva</text><text x="80" y="92" class="dim">abstracto</text>
-      </svg>
+<!-- aggregation: Clinica agrupa 0..* Mascota -->
+<line x1="710" y1="120" x2="632" y2="120" class="flow" marker-start="url(#c-agg)" marker-end="url(#c-flow)"/>
+<text x="650" y="110" class="code">0..*</text>
+<text x="640" y="140" class="dim">pacientes</text>
+
+<!-- legend -->
+<text x="20" y="30" class="dim">LEYENDA</text>
+<text x="20" y="52" class="code">+</text><text x="40" y="52" class="dim">público</text>
+<text x="20" y="72" class="code">-</text><text x="40" y="72" class="dim">privado (#)</text>
+<text x="20" y="92" class="code ital">cursiva</text><text x="80" y="92" class="dim">abstracto</text>
+</svg>

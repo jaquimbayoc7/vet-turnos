@@ -70,6 +70,8 @@ clinica.registrar({});        // TypeError: Solo se pueden registrar instancias 
 
 `Mascota` guarda una sola vez lo que comparten todos los pacientes (`nombre`, `#peso` y `especie`). Cada subclase reutiliza al padre y solo agrega lo que le es propio.
 
+![Diagrama de herencia: Perro, Gato y Ave extienden Mascota, llaman a super en el constructor y en describir() y agregan raza, deInterior o puedeVolar](img/herencia.svg)
+
 | Subclase | Campo propio | Constructor | `describir()` de ejemplo |
 | --- | --- | --- | --- |
 | `Perro` | `raza` | `super(nombre, peso, "perro")` | `Nombre: Rex, Peso: 12 Kg, Especie: perro, Raza: Labrador` |
@@ -112,8 +114,6 @@ El campo propio de cada especie cambia según el tipo elegido: `cargarExtra()` u
 - **Un atributo propio por subclase:** lo común vive en el padre; `raza`, `deInterior` y `puedeVolar` viven solo donde tienen sentido.
 - **Polimorfismo en dos métodos:** la misma llamada a `hacerSonido()` o `describir()` da un resultado distinto según la clase concreta, sin condicionales en `dibujar()`.
 - **Lo privado no cruza el borde:** los dos únicos miembros privados son `#peso` y `#pacientes`; todo lo demás es la interfaz pública.
-
-> El archivo `img/diagrama-clases.svg` aún muestra solo `Perro` y `Gato`; la versión actualizada con `Ave` está en [img/Herencia VetTurnos.html](img/Herencia%20VetTurnos.html).
 
 ## Historial de evolución
 
