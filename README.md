@@ -1,19 +1,21 @@
 # Vet Turnos
 
-Aplicación web inicial que aplica los pilares de la programación orientada a objetos (**abstracción, encapsulamiento, herencia y polimorfismo**) en JavaScript, usando como tema una veterinaria y sus mascotas. Se registran perros, gatos y aves desde un formulario y se muestran en una lista con su descripción y su sonido.
+Aplicación web que aplica los cuatro pilares de la programación orientada a objetos (**abstracción, encapsulamiento, herencia y polimorfismo**) en JavaScript, usando como tema una veterinaria y sus mascotas. Se registran perros, gatos y aves desde un formulario y se muestran en una lista con su descripción, su sonido y el valor de su consulta, junto con el total del día.
 
 ## Estructura del proyecto
 
 | Archivo | Descripción |
 | --- | --- |
-| [index.html](index.html) | Formulario de registro (tipo, nombre, peso y un campo propio de cada especie), lista de pacientes y contador total. |
+| [index.html](index.html) | Formulario de registro (tipo, nombre, peso y un campo propio de cada especie), lista de pacientes y total de consultas. |
 | [estilos.css](estilos.css) | Estilos de la página. |
-| [herencia.js](herencia.js) | **Versión actual**: abstracción + encapsulamiento + herencia (`Perro`, `Gato`, `Ave`, `Clinica`, fábricas por especie). |
-| [abs.js](abs.js) | Versión anterior: abstracción + encapsulamiento (campos privados, `Clinica`, validaciones). |
-| [programa.js](programa.js) | Primera versión: solo abstracción y herencia, con la lista de pacientes pública. |
+| [js/polimorfismo.js](js/polimorfismo.js) | **Versión actual**: abstracción + encapsulamiento + herencia + polimorfismo (`calcularConsulta()` y `Clinica.totalDia()`). |
+| [js/herencia.js](js/herencia.js) | Versión anterior: abstracción + encapsulamiento + herencia (`Perro`, `Gato`, `Ave`, `Clinica`, fábricas por especie). |
+| [js/abs.js](js/abs.js) | Versión anterior: abstracción + encapsulamiento (campos privados, `Clinica`, validaciones). |
+| [js/programa.js](js/programa.js) | Primera versión: solo abstracción y herencia, con la lista de pacientes pública. |
 | [img/](img) | Diagramas de abstracción, encapsulamiento, herencia y clases. |
+| [guia/](guia) | Guía "VetTurnos Web con GitHub" en HTML. |
 
-`index.html` carga `herencia.js`. Para ver una versión anterior, comenta esa línea y descomenta `abs.js` o `programa.js`.
+`index.html` carga `js/polimorfismo.js`. Para ver una versión anterior, comenta esa línea y descomenta la de `js/herencia.js`, `js/abs.js` o `js/programa.js`.
 
 ## Cómo ejecutarlo
 
@@ -26,7 +28,7 @@ No requiere instalación ni dependencias: abre `index.html` en el navegador (o u
 | Abstracción | `Mascota` es una clase abstracta: no se puede instanciar y obliga a las subclases a implementar `hacerSonido()`. |
 | Encapsulamiento | `#peso` en `Mascota` y `#pacientes` en `Clinica` son campos privados, accesibles solo por getters, setters y métodos. |
 | Herencia | `Perro`, `Gato` y `Ave` extienden `Mascota`: llaman a `super(...)` en el constructor y a `super.describir()` para reutilizar lo del padre. |
-| Polimorfismo | `dibujar()` llama a `m.describir()` y `m.hacerSonido()` y cada objeto responde según su clase ("Guau Guau", "Miau Miau" o "Pío Pío"). |
+| Polimorfismo | `dibujar()` llama a `m.describir()`, `m.hacerSonido()` y `m.calcularConsulta()` y cada objeto responde según su clase (sonido y valor de la consulta distintos). Ver [sección 4](#4-polimorfismo-una-llamada-varias-respuestas). |
 
 Diagrama completo (abstracción, encapsulamiento, herencia y clases): [img/Herencia VetTurnos.html](img/Herencia%20VetTurnos.html).
 
@@ -106,13 +108,36 @@ El campo propio de cada especie cambia según el tipo elegido: `cargarExtra()` u
 | Gato | Vive en | De interior, De calle |
 | Ave | Vuelo | Puede Volar, No Puede Volar |
 
-## 4. Diagrama de clases
+## 4. Polimorfismo: una llamada, varias respuestas
+
+La versión actual (`js/polimorfismo.js`) agrega el cálculo del valor de la consulta. `Mascota` declara el contrato `calcularConsulta()` y cada especie lo implementa a su manera; quien lo usa no pregunta de qué especie es el paciente.
+
+| Clase | `hacerSonido()` | `calcularConsulta()` |
+| --- | --- | --- |
+| `Perro` | `Guau Guau` | `30000 + peso * 1000` |
+| `Gato` | `Miau Miau` | `35000` fijo |
+| `Ave` | `Pío Pío` | `25000` si puede volar, `32000` si no |
+
+- **Contrato ampliado:** si una subclase no implementa `calcularConsulta()`, el método de `Mascota` lanza un `Error`.
+- **`Clinica.totalDia()`:** suma `calcularConsulta()` de todos los pacientes con `reduce`, sin condicionales por especie.
+- **`dibujar()` no cambia por especie:** muestra `describir()`, el sonido y el valor formateado con `dinero()` (`toLocaleString("es-CO")`), y actualiza "Pacientes hoy: N · Total consultas: $X".
+- **Cambios frente a `herencia.js`:** el constructor de `Mascota` recibe `(nombre, especie, peso)`, la especie se guarda con mayúscula inicial ("Perro"), `describir()` termina en `Kg.` y las opciones del formulario cambian (razas: Labrador, Criollo, Pastor alemán; vuelo: "Puede volar" / "No puede volar"). Los errores de validación son `Error` genéricos.
+
+```js
+const clinica = new Clinica();
+clinica.registrar(new Perro("Rex", 12, "Labrador"));   // 30000 + 12 * 1000 = 42000
+clinica.registrar(new Gato("Misu", 4, true));          // 35000
+clinica.registrar(new Ave("Pío", 0.3, true));          // 25000
+clinica.totalDia();                                    // 102000
+```
+
+## 5. Diagrama de clases
 
 ![Diagrama de clases UML: Mascota abstracta, Perro, Gato y Ave que la extienden, y Clinica que agrupa cero o más Mascota](img/diagrama-clases.svg)
 
 - **Una jerarquía, una colección:** `Mascota`, `Perro`, `Gato` y `Ave` forman la jerarquía. `Clinica` es independiente y solo conoce el tipo `Mascota`.
 - **Un atributo propio por subclase:** lo común vive en el padre; `raza`, `deInterior` y `puedeVolar` viven solo donde tienen sentido.
-- **Polimorfismo en dos métodos:** la misma llamada a `hacerSonido()` o `describir()` da un resultado distinto según la clase concreta, sin condicionales en `dibujar()`.
+- **Polimorfismo en tres métodos:** la misma llamada a `hacerSonido()`, `describir()` o `calcularConsulta()` da un resultado distinto según la clase concreta, sin condicionales en `dibujar()`. El diagrama aún no muestra `calcularConsulta()` ni `totalDia()`.
 - **Lo privado no cruza el borde:** los dos únicos miembros privados son `#peso` y `#pacientes`; todo lo demás es la interfaz pública.
 
 ## Historial de evolución
@@ -121,6 +146,7 @@ El campo propio de cada especie cambia según el tipo elegido: `cargarExtra()` u
 2. Abstracción con herencia (`programa.js`).
 3. Abstracción con encapsulamiento (`abs.js`): campos privados, validaciones y clase `Clinica`.
 4. Herencia dinámica (`herencia.js`): clase `Ave`, método `describir()` con `super`, campo propio por especie y fábricas.
+5. Polimorfismo (`polimorfismo.js`): `calcularConsulta()` por especie, `Clinica.totalDia()` y archivos JS organizados en la carpeta `js/`.
 
 ## Autor
 
