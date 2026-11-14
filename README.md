@@ -118,6 +118,8 @@ La versión actual (`js/polimorfismo.js`) agrega el cálculo del valor de la con
 | `Gato` | `Miau Miau` | `35000` fijo |
 | `Ave` | `Pío Pío` | `25000` si puede volar, `32000` si no |
 
+![Diagrama de polimorfismo: dibujar() llama al contrato Mascota y cada clase responde con su sonido y el valor de su consulta](img/polimorfismo.svg)
+
 - **Contrato ampliado:** si una subclase no implementa `calcularConsulta()`, el método de `Mascota` lanza un `Error`.
 - **`Clinica.totalDia()`:** suma `calcularConsulta()` de todos los pacientes con `reduce`, sin condicionales por especie.
 - **`dibujar()` no cambia por especie:** muestra `describir()`, el sonido y el valor formateado con `dinero()` (`toLocaleString("es-CO")`), y actualiza "Pacientes hoy: N · Total consultas: $X".
@@ -137,7 +139,7 @@ clinica.totalDia();                                    // 102000
 
 - **Una jerarquía, una colección:** `Mascota`, `Perro`, `Gato` y `Ave` forman la jerarquía. `Clinica` es independiente y solo conoce el tipo `Mascota`.
 - **Un atributo propio por subclase:** lo común vive en el padre; `raza`, `deInterior` y `puedeVolar` viven solo donde tienen sentido.
-- **Polimorfismo en tres métodos:** la misma llamada a `hacerSonido()`, `describir()` o `calcularConsulta()` da un resultado distinto según la clase concreta, sin condicionales en `dibujar()`. El diagrama aún no muestra `calcularConsulta()` ni `totalDia()`.
+- **Polimorfismo en tres métodos:** la misma llamada a `hacerSonido()`, `describir()` o `calcularConsulta()` da un resultado distinto según la clase concreta, sin condicionales en `dibujar()`. `calcularConsulta()` es abstracto en `Mascota` y `Clinica` suma las consultas con `totalDia()`.
 - **Lo privado no cruza el borde:** los dos únicos miembros privados son `#peso` y `#pacientes`; todo lo demás es la interfaz pública.
 
 ## Historial de evolución
